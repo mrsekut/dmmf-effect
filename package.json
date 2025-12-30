@@ -8,6 +8,7 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
+    "@effect/language-service": "^0.63.2",
     "@types/bun": "latest",
     "prettier": "^3.7.4"
   },
