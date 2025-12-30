@@ -1,15 +1,7 @@
 # dmmf-effect
 
-To install dependencies:
+An implementation of "Domain Modeling Made Functional" using [Effect](https://effect.website/). (雑)
 
-```bash
-bun install
-```
+This is for my personal learning purposes.
 
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.3.2. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+https://scrapbox.io/mrsekut-p/dmmf-effect
