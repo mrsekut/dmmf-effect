@@ -36,7 +36,7 @@ export const placeOrderWorkflow = (
     const queue = yield* OrderEventQueue;
     yield* Effect.all(result.events.map(e => Queue.offer(queue, e)));
 
-    yield* Effect.log(`Order placed: ${result.order.orderId}`);
+    yield* Effect.log(`Order placed: ${result.order.id}`);
 
     return result;
   });

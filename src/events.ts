@@ -4,7 +4,7 @@
  */
 export type OrderPlacedEvent = {
   orderId: string;
-  customerName: string;
+  customerId: string;
   shippingAddress: {
     street: string;
     city: string;

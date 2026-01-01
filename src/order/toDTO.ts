@@ -7,8 +7,8 @@ import type { Order } from './domain';
  */
 export const toDTO = (order: Order) =>
   ({
-    orderId: order.orderId,
-    customerName: order.customerInfo.name,
+    orderId: order.id,
+    customerId: order.customerId,
     shippingAddress: order.shippingAddress,
     orderLines: order.orderLines.map(l => ({
       productId: l.productCode,

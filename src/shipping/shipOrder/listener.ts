@@ -43,7 +43,7 @@ const handleOrderPlacedEvent = (event: OrderPlacedEvent) =>
 const fromOrderPlacedEvent = (event: OrderPlacedEvent) =>
   ({
     orderReference: event.orderId,
-    customerName: event.customerName,
+    customerId: event.customerId,
     shippingAddress: event.shippingAddress,
     items: event.orderLines.map(line => ({
       productId: line.productId,

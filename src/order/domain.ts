@@ -2,7 +2,7 @@ import { Effect, Schema } from 'effect';
 
 import { ProductCode } from './ProductCode';
 import { OrderQuantity } from './OrderQuantity';
-import { CustomerInfo } from './CustomerInfo';
+import { CustomerId } from './CustomerInfo';
 
 /**
  * 注文ID
@@ -48,8 +48,14 @@ const BillingAddress = Address.pipe(Schema.brand('BillingAddress'));
 /**
  * 注文明細行 (Entity)
  */
+type OrderLineId = typeof OrderLineId.Type;
+const OrderLineId = Schema.String.pipe(Schema.minLength(1)).pipe(
+  Schema.brand('OrderLineId'),
+);
+
 type OrderLine = typeof OrderLine.Type;
 const OrderLine = Schema.Struct({
+  id: OrderLineId,
   productCode: ProductCode,
   productName: Schema.String.pipe(Schema.minLength(1)),
   quantity: OrderQuantity,
@@ -61,8 +67,8 @@ const OrderLine = Schema.Struct({
  */
 export type Order = typeof Order.Type;
 export const Order = Schema.Struct({
-  orderId: OrderId,
-  customerInfo: CustomerInfo,
+  id: OrderId,
+  customerId: CustomerId,
   shippingAddress: ShippingAddress,
   billingAddress: BillingAddress,
   orderLines: Schema.Array(OrderLine),
@@ -240,4 +246,14 @@ export const calculateTotal = (order: Order) => {
     0,
   );
   return BillingAmount.make(total);
+};
+
+export const changeOrderLinePrice = (
+  order: Order,
+  lineId: OrderLineId,
+  newPrice: BillingAmount,
+) => {
+  return order.orderLines.map(line =>
+    line.id === lineId ? { ...line, unitPrice: newPrice } : line,
+  );
 };

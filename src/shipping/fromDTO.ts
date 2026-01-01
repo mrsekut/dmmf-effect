@@ -3,7 +3,7 @@ import * as Domain from './domain';
 
 export type ShipOrderDTO = {
   readonly orderReference: string;
-  readonly customerName: string;
+  readonly customerId: string;
   readonly shippingAddress: {
     readonly street: string;
     readonly city: string;
@@ -24,7 +24,7 @@ export const fromDTO = (command: ShipOrderDTO) =>
   Schema.decodeUnknown(Domain.Shipment)({
     shipmentId: crypto.randomUUID(),
     orderReference: command.orderReference,
-    customerName: command.customerName,
+    customerId: command.customerId,
     shippingAddress: command.shippingAddress,
     items: command.items,
     status: 'pending',

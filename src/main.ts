@@ -48,7 +48,7 @@ const program = Effect.gen(function* () {
     ],
   });
 
-  yield* Effect.log(`注文ID: ${order1Result.order.orderId}`);
+  yield* Effect.log(`注文ID: ${order1Result.order.id}`);
 
   yield* Effect.sleep('100 millis'); // 発送処理が完了するのを待つ
 
@@ -75,7 +75,7 @@ const program = Effect.gen(function* () {
     ],
   });
 
-  yield* Effect.log(`注文ID: ${order2Result.order.orderId}`);
+  yield* Effect.log(`注文ID: ${order2Result.order.id}`);
 
   yield* Effect.sleep('100 millis'); // 発送処理が完了するのを待つ
 
