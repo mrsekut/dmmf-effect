@@ -21,6 +21,8 @@ type PlaceOrderResult = {
  *  2. ワークフロー実行: ビジネスロジック
  *  3. 出力ゲート: イベントDTOに変換
  *  4. イベントをキューに送信
+ *
+ * TODO: たぶんPlaceorder型を使うはず
  */
 export const placeOrderWorkflow = (
   command: PlaceOrderDTO,

@@ -25,3 +25,14 @@ export const CustomerInfo = Schema.Struct({
   name: CustomerName,
   emailAddress: Schema.String.pipe(Schema.pattern(/^[^@]+@[^@]+$/)),
 });
+
+/**
+ * UnvalidatedCustomerInfo（未検証の顧客情報）
+ * - プリミティブ型のみ
+ */
+export type UnvalidatedCustomerInfo = typeof UnvalidatedCustomerInfo.Type;
+export const UnvalidatedCustomerInfo = Schema.Struct({
+  customerId: Schema.String,
+  name: Schema.String,
+  email: Schema.String,
+});

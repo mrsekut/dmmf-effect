@@ -7,6 +7,7 @@ import type { Order } from './domain';
  */
 export const toDTO = (order: Order) =>
   ({
+    type: 'OrderPlaced',
     orderId: order.id,
     customerId: order.customerId,
     shippingAddress: order.shippingAddress,

@@ -3,7 +3,7 @@
  */
 
 export * from './domain';
-export * from './CustomerInfo';
+export * from './Customer';
 export * from './ProductCode';
 export * from './OrderQuantity';
 export { placeOrderWorkflow } from './workflow';

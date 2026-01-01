@@ -2,14 +2,16 @@ import { Effect, Schema } from 'effect';
 
 import { ProductCode } from './ProductCode';
 import { OrderQuantity } from './OrderQuantity';
-import { CustomerId } from './CustomerInfo';
+import { CustomerId, UnvalidatedCustomerInfo } from './Customer';
+import { ShippingAddress, BillingAddress, UnvalidatedAddress } from './Address';
+import type { PlaceOrderError, PlaceOrderEvents } from '../events/PlaceOrder';
 
 /**
  * 注文ID
  * - 空でない文字列
  */
-type OrderId = typeof OrderId.Type;
-const OrderId = Schema.NonEmptyString.pipe(Schema.brand('OrderId'));
+export type OrderId = typeof OrderId.Type;
+export const OrderId = Schema.NonEmptyString.pipe(Schema.brand('OrderId'));
 
 /**
  * Price（価格）
@@ -25,35 +27,11 @@ const Price = Schema.Number.pipe(
  * BillingAmount（請求金額）
  * - 0以上
  */
-type BillingAmount = typeof BillingAmount.Type;
-const BillingAmount = Schema.Number.pipe(
+export type BillingAmount = typeof BillingAmount.Type;
+export const BillingAmount = Schema.Number.pipe(
   Schema.greaterThanOrEqualTo(0),
   Schema.brand('BillingAmount'),
 );
-
-/**
- * 住所 (Value Object)
- */
-type Address = typeof Address.Type;
-const Address = Schema.Struct({
-  street: Schema.String.pipe(Schema.minLength(1)),
-  city: Schema.String.pipe(Schema.minLength(1)),
-  zipCode: Schema.String.pipe(Schema.pattern(/^\d{3}-?\d{4}$/)),
-}).pipe(Schema.brand('Address'));
-
-/**
- * ShippingAddress（配送先住所）
- * TODO:
- */
-type ShippingAddress = typeof ShippingAddress.Type;
-const ShippingAddress = Address.pipe(Schema.brand('ShippingAddress'));
-
-/**
- * BillingAddress（請求先住所）
- * TODO:
- */
-type BillingAddress = typeof BillingAddress.Type;
-const BillingAddress = Address.pipe(Schema.brand('BillingAddress'));
 
 /**
  * 注文明細行 (Entity)
@@ -89,32 +67,10 @@ export const Order = Schema.Struct({
  * UnvalidatedOrderLine（未検証の注文明細行）
  * - プリミティブ型のみ
  */
-type UnvalidatedOrderLine = typeof UnvalidatedOrderLine.Type;
-const UnvalidatedOrderLine = Schema.Struct({
+export type UnvalidatedOrderLine = typeof UnvalidatedOrderLine.Type;
+export const UnvalidatedOrderLine = Schema.Struct({
   productCode: Schema.String,
   quantity: Schema.Number,
-});
-
-/**
- * UnvalidatedAddress（未検証の住所）
- * - プリミティブ型のみ
- */
-type UnvalidatedAddress = typeof UnvalidatedAddress.Type;
-const UnvalidatedAddress = Schema.Struct({
-  street: Schema.String,
-  city: Schema.String,
-  zipCode: Schema.String,
-});
-
-/**
- * UnvalidatedCustomerInfo（未検証の顧客情報）
- * - プリミティブ型のみ
- */
-type UnvalidatedCustomerInfo = typeof UnvalidatedCustomerInfo.Type;
-const UnvalidatedCustomerInfo = Schema.Struct({
-  customerId: Schema.String,
-  name: Schema.String,
-  email: Schema.String,
 });
 
 /**
@@ -142,81 +98,8 @@ export const ValidatedOrder = Schema.Struct({
 });
 
 /**
- * AcknowledgmentSent（確認送信済み）イベント
- */
-type AcknowledgmentSentEvent = typeof AcknowledgmentSentEvent.Type;
-const AcknowledgmentSentEvent = Schema.Struct({
-  type: Schema.Literal('AcknowledgmentSent'),
-  orderId: OrderId,
-  emailAddress: Schema.String,
-});
-
-/**
- * OrderPlaced（注文確定）イベント
- */
-type OrderPlacedEvent = typeof OrderPlacedEvent.Type;
-const OrderPlacedEvent = Schema.Struct({
-  type: Schema.Literal('OrderPlaced'),
-  orderId: OrderId,
-  // TODO: events.tsにあるやつかな
-});
-
-/**
- * BillableOrderPlaced（請求可能な注文確定）イベント
- */
-type BillableOrderPlacedEvent = typeof BillableOrderPlacedEvent.Type;
-const BillableOrderPlacedEvent = Schema.Struct({
-  type: Schema.Literal('BillableOrderPlaced'),
-  orderId: OrderId,
-  billingAmount: BillingAmount,
-});
-
-/**
- * PlaceOrderEvents（注文確定イベント）
- * - ワークフローが成功したときのイベント型
- * - ワークフローが複数の出力を持つ場合、レコード型でまとめる
- */
-type PlaceOrderEvents = typeof PlaceOrderEvents.Type;
-const PlaceOrderEvents = Schema.Struct({
-  acknowledgmentSent: AcknowledgmentSentEvent,
-  orderPlaced: OrderPlacedEvent,
-  billableOrderPlaced: BillableOrderPlacedEvent,
-});
-
-/**
- * ValidationError（検証エラー）
- * - エラーの説明とどのフィールドに適用されるかを含む
- */
-type ValidationError = typeof ValidationError.Type;
-const ValidationError = Schema.Struct({
-  fieldName: Schema.String,
-  errorDescription: Schema.String,
-});
-
-/**
- * PlaceOrderError（注文確定エラー）
- * - ワークフローが失敗したときのエラー型
- */
-type PlaceOrderError = typeof PlaceOrderError.Type;
-const PlaceOrderError = Schema.Union(
-  Schema.Struct({
-    type: Schema.Literal('ValidationError'),
-    errors: Schema.Array(ValidationError),
-  }),
-  Schema.Struct({
-    type: Schema.Literal('PricingError'),
-    message: Schema.String,
-  }),
-  Schema.Struct({
-    type: Schema.Literal('ServiceError'),
-    message: Schema.String,
-  }),
-);
-
-/**
  * PlaceOrder ワークフロー
  * - 「注文確定」プロセス
- * - UnvalidatedOrder -> Result<PlaceOrderEvents, PlaceOrderError>
  */
 export type PlaceOrder = (
   uo: UnvalidatedOrder,
