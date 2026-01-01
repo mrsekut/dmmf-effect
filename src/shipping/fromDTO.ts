@@ -11,7 +11,6 @@ export type ShipOrderDTO = {
   };
   readonly items: readonly {
     readonly productId: string;
-    readonly productName: string;
     readonly quantity: number;
   }[];
 };

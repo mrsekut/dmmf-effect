@@ -42,7 +42,6 @@ export const ShippingAddress = Schema.Struct({
 export type ShipmentItem = typeof ShipmentItem.Type;
 export const ShipmentItem = Schema.Struct({
   productId: ProductCode,
-  productName: Schema.String.pipe(Schema.minLength(1)),
   quantity: OrderQuantity,
 }).pipe(Schema.brand('ShipmentItem'));
 

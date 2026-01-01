@@ -47,7 +47,6 @@ const fromOrderPlacedEvent = (event: OrderPlacedEvent) =>
     shippingAddress: event.shippingAddress,
     items: event.orderLines.map(line => ({
       productId: line.productId,
-      productName: line.productName,
       quantity: line.quantity,
     })),
   }) as const satisfies ShipOrderDTO;

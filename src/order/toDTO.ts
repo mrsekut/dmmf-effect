@@ -12,8 +12,6 @@ export const toDTO = (order: Order) =>
     shippingAddress: order.shippingAddress,
     orderLines: order.orderLines.map(l => ({
       productId: l.productCode,
-      productName: l.productName,
       quantity: l.quantity,
     })),
-    placedAt: order.placedAt,
   }) as const satisfies OrderPlacedEvent;

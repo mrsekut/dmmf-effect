@@ -12,10 +12,8 @@ export type OrderPlacedEvent = {
   };
   orderLines: {
     productId: string;
-    productName: string;
     quantity: number;
   }[];
-  placedAt: Date;
 };
 
 /**
