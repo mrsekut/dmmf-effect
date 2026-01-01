@@ -8,10 +8,10 @@ import type { Order } from './domain';
 export const toDTO = (order: Order) =>
   ({
     orderId: order.orderId,
-    customerName: order.customerName,
+    customerName: order.customerInfo.name,
     shippingAddress: order.shippingAddress,
     orderLines: order.orderLines.map(l => ({
-      productId: l.productId,
+      productId: l.productCode,
       productName: l.productName,
       quantity: l.quantity,
     })),

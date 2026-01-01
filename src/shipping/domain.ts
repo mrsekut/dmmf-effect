@@ -1,5 +1,5 @@
 import { Schema } from 'effect';
-import { CustomerName, ProductId, Quantity } from '../order/domain';
+import { CustomerName, ProductCode, OrderQuantity } from '../order/domain';
 
 /**
  * 発送ID
@@ -41,9 +41,9 @@ export const ShippingAddress = Schema.Struct({
  */
 export type ShipmentItem = typeof ShipmentItem.Type;
 export const ShipmentItem = Schema.Struct({
-  productId: ProductId,
+  productId: ProductCode,
   productName: Schema.String.pipe(Schema.minLength(1)),
-  quantity: Quantity,
+  quantity: OrderQuantity,
 }).pipe(Schema.brand('ShipmentItem'));
 
 /**
