@@ -1,83 +1,15 @@
 import { Effect, Schema } from 'effect';
 
+import { ProductCode } from './ProductCode';
+import { OrderQuantity } from './OrderQuantity';
+import { CustomerInfo } from './CustomerInfo';
+
 /**
  * 注文ID
  * - 空でない文字列
  */
 type OrderId = typeof OrderId.Type;
 const OrderId = Schema.NonEmptyString.pipe(Schema.brand('OrderId'));
-
-/**
- * WidgetCode（装置コード）
- * - "W" で始まる4桁のコード
- */
-type WidgetCode = typeof WidgetCode.Type;
-const WidgetCode = Schema.String.pipe(
-  Schema.pattern(/^W\d{4}$/),
-  Schema.brand('WidgetCode'),
-);
-
-/**
- * GizmoCode（ギズモコード）
- * - "G" で始まる3桁のコード
- */
-type GizmoCode = typeof GizmoCode.Type;
-const GizmoCode = Schema.String.pipe(
-  Schema.pattern(/^G\d{3}$/),
-  Schema.brand('GizmoCode'),
-);
-
-/**
- * ProductCode（商品コード）
- */
-export type ProductCode = typeof ProductCode.Type;
-export const ProductCode = Schema.Union(WidgetCode, GizmoCode);
-
-/**
- * 顧客名
- * - 1〜50文字
- */
-export type CustomerName = typeof CustomerName.Type;
-export const CustomerName = Schema.String.pipe(
-  Schema.minLength(1, { message: () => '顧客名は必須です' }),
-  Schema.maxLength(50, { message: () => '顧客名は50文字以内です' }),
-  Schema.brand('CustomerName'),
-);
-
-/**
- * CustomerInfo（顧客情報）
- */
-type CustomerInfo = typeof CustomerInfo.Type;
-const CustomerInfo = Schema.Struct({
-  name: CustomerName,
-  emailAddress: Schema.String.pipe(Schema.pattern(/^[^@]+@[^@]+$/)),
-});
-
-/**
- * UnitQuantity（個数）
- */
-type UnitQuantity = typeof UnitQuantity.Type;
-const UnitQuantity = Schema.Int.pipe(
-  Schema.greaterThanOrEqualTo(1),
-  Schema.lessThanOrEqualTo(1000),
-  Schema.brand('UnitQuantity'),
-);
-
-/**
- * KilogramQuantity（重量）
- */
-type KilogramQuantity = typeof KilogramQuantity.Type;
-const KilogramQuantity = Schema.Number.pipe(
-  Schema.greaterThanOrEqualTo(0.05),
-  Schema.lessThanOrEqualTo(100.0),
-  Schema.brand('KilogramQuantity'),
-);
-
-/**
- * OrderQuantity（注文数量）
- */
-export type OrderQuantity = typeof OrderQuantity.Type;
-export const OrderQuantity = Schema.Union(UnitQuantity, KilogramQuantity);
 
 /**
  * BillingAmount（請求金額）

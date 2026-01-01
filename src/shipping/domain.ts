@@ -1,5 +1,5 @@
 import { Schema } from 'effect';
-import { CustomerName, ProductCode, OrderQuantity } from '../order/domain';
+import { CustomerName, ProductCode, OrderQuantity } from '../order';
 
 /**
  * 発送ID
