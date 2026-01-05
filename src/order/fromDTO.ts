@@ -16,6 +16,7 @@ export type PlaceOrderDTO = {
   orderLines: {
     productCode: string;
     quantity: number;
+    price: number;
   }[];
   amountToBill: number;
 };
@@ -37,6 +38,7 @@ export const fromDTO = (dto: PlaceOrderDTO) => {
       orderId: orderId,
       productCode: line.productCode,
       quantity: line.quantity,
+      price: line.price,
     })),
     amountToBill: dto.amountToBill,
   });

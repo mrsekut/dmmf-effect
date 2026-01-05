@@ -2,8 +2,16 @@ import { it } from '@effect/vitest';
 import { expect } from 'vitest';
 import { Effect, Fiber, Logger, Queue, Chunk, TestClock } from 'effect';
 import { QueuesLive, ShippingEventQueue } from './queues';
-import { placeOrderWorkflow } from './order';
+import { placeOrderWorkflow, type PlaceOrderCommand } from './order';
 import { startShippingEventListener } from './shipping';
+
+const createPlaceOrderCommand = (
+  data: PlaceOrderCommand['data'],
+): PlaceOrderCommand => ({
+  data,
+  timestamp: new Date(),
+  userId: 'test-user',
+});
 
 /**
  * Bounded Context 統合テスト
@@ -21,34 +29,38 @@ it.effect(
       const shippingFiber = yield* Effect.fork(startShippingEventListener);
       yield* TestClock.adjust('100 millis');
 
-      const orderResult = yield* placeOrderWorkflow({
-        customerId: '1234567890',
-        shippingAddress: {
-          street: '東京都渋谷区1-2-3',
-          city: '渋谷区',
-          zipCode: '150-0001',
-        },
-        billingAddress: {
-          street: '東京都渋谷区1-2-3',
-          city: '渋谷区',
-          zipCode: '150-0001',
-        },
-        orderLines: [
-          {
-            productId: 'W1234',
-            productName: 'TypeScript入門',
-            quantity: 2,
-            unitPrice: 3000,
+      const orderResult = yield* placeOrderWorkflow(
+        createPlaceOrderCommand({
+          orderId: crypto.randomUUID(),
+          customerInfo: {
+            customerId: '1234567890',
+            name: 'テスト顧客',
+            emailAddress: 'test@example.com',
           },
-          {
-            productId: 'G123',
-            productName: 'Effect入門',
-            quantity: 1,
-            unitPrice: 4500,
+          shippingAddress: {
+            street: '東京都渋谷区1-2-3',
+            city: '渋谷区',
+            zipCode: '150-0001',
           },
-        ],
-        amountToBill: 10500,
-      });
+          billingAddress: {
+            street: '東京都渋谷区1-2-3',
+            city: '渋谷区',
+            zipCode: '150-0001',
+          },
+          orderLines: [
+            {
+              productCode: 'W1234',
+              quantity: 2,
+              price: 3000,
+            },
+            {
+              productCode: 'G123',
+              quantity: 1,
+              price: 4500,
+            },
+          ],
+        }),
+      );
 
       yield* TestClock.adjust('100 millis');
 
@@ -71,53 +83,63 @@ it.effect('複数の注文を順次処理できる', () =>
     const shippingFiber = yield* Effect.fork(startShippingEventListener);
     yield* TestClock.adjust('100 millis');
 
-    const order1Result = yield* placeOrderWorkflow({
-      customerId: '1234567890',
-      shippingAddress: {
-        street: '東京都渋谷区1-2-3',
-        city: '渋谷区',
-        zipCode: '150-0001',
-      },
-      billingAddress: {
-        street: '東京都渋谷区1-2-3',
-        city: '渋谷区',
-        zipCode: '150-0001',
-      },
-      orderLines: [
-        {
-          productId: 'W1234',
-          productName: 'TypeScript入門',
-          quantity: 2,
-          unitPrice: 3000,
+    const order1Result = yield* placeOrderWorkflow(
+      createPlaceOrderCommand({
+        orderId: crypto.randomUUID(),
+        customerInfo: {
+          customerId: '1234567890',
+          name: 'テスト顧客1',
+          emailAddress: 'test1@example.com',
         },
-      ],
-      amountToBill: 6000,
-    });
+        shippingAddress: {
+          street: '東京都渋谷区1-2-3',
+          city: '渋谷区',
+          zipCode: '150-0001',
+        },
+        billingAddress: {
+          street: '東京都渋谷区1-2-3',
+          city: '渋谷区',
+          zipCode: '150-0001',
+        },
+        orderLines: [
+          {
+            productCode: 'W1234',
+            quantity: 2,
+            price: 3000,
+          },
+        ],
+      }),
+    );
 
     yield* TestClock.adjust('100 millis');
 
-    const order2Result = yield* placeOrderWorkflow({
-      customerId: '1234567890',
-      shippingAddress: {
-        street: '大阪府大阪市北区4-5-6',
-        city: '大阪市',
-        zipCode: '530-0001',
-      },
-      billingAddress: {
-        street: '大阪府大阪市北区4-5-6',
-        city: '大阪市',
-        zipCode: '530-0001',
-      },
-      orderLines: [
-        {
-          productId: 'G456',
-          productName: '関数型プログラミング',
-          quantity: 1,
-          unitPrice: 5000,
+    const order2Result = yield* placeOrderWorkflow(
+      createPlaceOrderCommand({
+        orderId: crypto.randomUUID(),
+        customerInfo: {
+          customerId: '1234567890',
+          name: 'テスト顧客2',
+          emailAddress: 'test2@example.com',
         },
-      ],
-      amountToBill: 5000,
-    });
+        shippingAddress: {
+          street: '大阪府大阪市北区4-5-6',
+          city: '大阪市',
+          zipCode: '530-0001',
+        },
+        billingAddress: {
+          street: '大阪府大阪市北区4-5-6',
+          city: '大阪市',
+          zipCode: '530-0001',
+        },
+        orderLines: [
+          {
+            productCode: 'G456',
+            quantity: 1,
+            price: 5000,
+          },
+        ],
+      }),
+    );
 
     yield* TestClock.adjust('100 millis');
 

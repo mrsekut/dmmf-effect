@@ -61,6 +61,7 @@ const OrderLine = Schema.Struct({
 export type UnvalidatedOrderLine = {
   productCode: string;
   quantity: number;
+  price: number;
 };
 
 /**

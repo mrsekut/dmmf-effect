@@ -2,13 +2,13 @@ import { Effect, Queue } from 'effect';
 import type { ParseError } from 'effect/ParseResult';
 import { OrderEventQueue } from '../../../queues';
 import { fromDTO } from '../../fromDTO';
-import type { Order, ValidatedOrder } from '../../Order';
+import type { ValidatedOrder } from '../../Order';
 import { toDTO } from '../../toDTO';
 import type { PlaceOrderCommand } from './command';
 import type { OrderPlacedEvent } from '../../../events';
 
 type PlaceOrderResult = {
-  readonly order: Order;
+  readonly order: ValidatedOrder;
   readonly events: readonly OrderPlacedEvent[];
 };
 
@@ -38,9 +38,10 @@ export const placeOrderWorkflow = (
       orderLines: unvalidatedOrder.orderLines.map(l => ({
         productCode: l.productCode,
         quantity: l.quantity,
+        price: l.price,
       })),
       amountToBill: unvalidatedOrder.orderLines.reduce(
-        (sum, l) => sum + l.quantity,
+        (sum, l) => sum + l.quantity * l.price,
         0,
       ),
     });
