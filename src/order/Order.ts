@@ -9,6 +9,12 @@ import {
   UnvalidatedAddress,
 } from './Address';
 import type { PlaceOrderError, PlaceOrderEvents } from '../events/PlaceOrder';
+import {
+  type UnvalidatedOrderLine,
+  OrderLine,
+  OrderLineId,
+  Price,
+} from './OrderLine';
 
 /**
  * 注文ID
@@ -16,16 +22,6 @@ import type { PlaceOrderError, PlaceOrderEvents } from '../events/PlaceOrder';
  */
 export type OrderId = typeof OrderId.Type;
 export const OrderId = Schema.NonEmptyString.pipe(Schema.brand('OrderId'));
-
-/**
- * Price（価格）
- * - 0以上
- */
-type Price = typeof Price.Type;
-const Price = Schema.Number.pipe(
-  Schema.greaterThanOrEqualTo(0),
-  Schema.brand('Price'),
-);
 
 /**
  * BillingAmount（請求金額）
@@ -36,33 +32,6 @@ export const BillingAmount = Schema.Number.pipe(
   Schema.greaterThanOrEqualTo(0),
   Schema.brand('BillingAmount'),
 );
-
-/**
- * 注文明細行 (Entity)
- */
-type OrderLineId = typeof OrderLineId.Type;
-const OrderLineId = Schema.String.pipe(Schema.minLength(1)).pipe(
-  Schema.brand('OrderLineId'),
-);
-
-type OrderLine = typeof OrderLine.Type;
-const OrderLine = Schema.Struct({
-  id: OrderLineId,
-  orderId: OrderId,
-  productCode: ProductCode,
-  quantity: OrderQuantity,
-  price: Price,
-}).pipe(Schema.brand('OrderLine'));
-
-/**
- * UnvalidatedOrderLine（未検証の注文明細行）
- * - プリミティブ型のみ
- */
-export type UnvalidatedOrderLine = {
-  productCode: string;
-  quantity: number;
-  price: number;
-};
 
 /**
  * UnvalidatedOrder（未検証の注文）
@@ -212,14 +181,12 @@ if (import.meta.vitest) {
 
   const createOrderLine = (
     id: string,
-    orderId: string,
     productCode: string,
     quantity: number,
     price: number,
   ) =>
     OrderLine.make({
       id: OrderLineId.make(id),
-      orderId: OrderId.make(orderId),
       productCode: Schema.decodeSync(ProductCode)(productCode),
       quantity: Schema.decodeSync(OrderQuantity)(quantity),
       price: Price.make(price),
@@ -255,8 +222,8 @@ if (import.meta.vitest) {
 
   describe('changeOrderLinePrice', () => {
     test('指定したOrderLineのpriceを更新する', () => {
-      const line1 = createOrderLine('line-1', 'order-1', 'W1234', 2, 100);
-      const line2 = createOrderLine('line-2', 'order-1', 'G123', 3, 200);
+      const line1 = createOrderLine('line-1', 'W1234', 2, 100);
+      const line2 = createOrderLine('line-2', 'G123', 3, 200);
       const order = createValidatedOrder([line1, line2], 800);
 
       const result = changeOrderLinePrice(
@@ -272,8 +239,8 @@ if (import.meta.vitest) {
     });
 
     test('amountToBillを再計算して更新する', () => {
-      const line1 = createOrderLine('line-1', 'order-1', 'W1234', 2, 100);
-      const line2 = createOrderLine('line-2', 'order-1', 'G123', 3, 200);
+      const line1 = createOrderLine('line-1', 'W1234', 2, 100);
+      const line2 = createOrderLine('line-2', 'G123', 3, 200);
       // 初期: 2*100 + 3*200 = 800
       const order = createValidatedOrder([line1, line2], 800);
 
@@ -288,7 +255,7 @@ if (import.meta.vitest) {
     });
 
     test('存在しないlineIdの場合はorderを変更しない', () => {
-      const line1 = createOrderLine('line-1', 'order-1', 'W1234', 2, 100);
+      const line1 = createOrderLine('line-1', 'W1234', 2, 100);
       const order = createValidatedOrder([line1], 200);
 
       const result = changeOrderLinePrice(
@@ -304,8 +271,8 @@ if (import.meta.vitest) {
 
   describe('calculateTotal', () => {
     test('orderLinesの合計金額を計算する', () => {
-      const line1 = createOrderLine('line-1', 'order-1', 'W1234', 2, 100);
-      const line2 = createOrderLine('line-2', 'order-1', 'G123', 3, 200);
+      const line1 = createOrderLine('line-1', 'W1234', 2, 100);
+      const line2 = createOrderLine('line-2', 'G123', 3, 200);
       const order = createValidatedOrder([line1, line2], 0);
 
       const result = calculateTotal(order);
