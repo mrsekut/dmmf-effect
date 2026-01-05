@@ -21,12 +21,10 @@ export type ShipOrderDTO = {
  */
 export const fromDTO = (command: ShipOrderDTO) =>
   Schema.decodeUnknown(Domain.Shipment)({
+    status: 'pending',
     shipmentId: crypto.randomUUID(),
     orderReference: command.orderReference,
     customerId: command.customerId,
     shippingAddress: command.shippingAddress,
     items: command.items,
-    status: 'pending',
-    trackingNumber: null,
-    shippedAt: null,
   });
