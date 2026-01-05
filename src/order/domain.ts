@@ -3,7 +3,11 @@ import { Effect, Schema } from 'effect';
 import { ProductCode } from './ProductCode';
 import { OrderQuantity } from './OrderQuantity';
 import { CustomerId, type UnvalidatedCustomerInfo } from './Customer';
-import { ShippingAddress, BillingAddress, UnvalidatedAddress } from './Address';
+import {
+  ValidatedShippingAddress,
+  ValidatedBillingAddress,
+  UnvalidatedAddress,
+} from './Address';
 import type { PlaceOrderError, PlaceOrderEvents } from '../events/PlaceOrder';
 
 /**
@@ -52,13 +56,14 @@ const OrderLine = Schema.Struct({
 
 /**
  * 注文 (Aggregate Root)
+ * @deprecated
  */
 export type Order = typeof Order.Type;
 export const Order = Schema.Struct({
   id: OrderId,
   customerId: CustomerId,
-  shippingAddress: ShippingAddress,
-  billingAddress: BillingAddress,
+  shippingAddress: ValidatedShippingAddress,
+  billingAddress: ValidatedBillingAddress,
   orderLines: Schema.NonEmptyArray(OrderLine),
   amountToBill: BillingAmount,
 }).pipe(Schema.brand('Order'));
@@ -92,7 +97,12 @@ type UnvalidatedOrder = {
 export type ValidatedOrder = typeof ValidatedOrder.Type;
 export const ValidatedOrder = Schema.Struct({
   type: Schema.Literal('ValidatedOrder'),
-  // TODO:
+  id: OrderId,
+  customerId: CustomerId,
+  shippingAddress: ValidatedShippingAddress,
+  billingAddress: ValidatedBillingAddress,
+  orderLines: Schema.NonEmptyArray(OrderLine),
+  amountToBill: BillingAmount,
 });
 
 /**

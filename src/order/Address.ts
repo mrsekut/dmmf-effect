@@ -12,17 +12,19 @@ const Address = Schema.Struct({
 
 /**
  * ShippingAddress（配送先住所）
- * TODO:
  */
-export type ShippingAddress = typeof ShippingAddress.Type;
-export const ShippingAddress = Address.pipe(Schema.brand('ShippingAddress'));
+export type ValidatedShippingAddress = typeof ValidatedShippingAddress.Type;
+export const ValidatedShippingAddress = Address.pipe(
+  Schema.brand('ValidatedShippingAddress'),
+);
 
 /**
  * BillingAddress（請求先住所）
- * TODO:
  */
-export type BillingAddress = typeof BillingAddress.Type;
-export const BillingAddress = Address.pipe(Schema.brand('BillingAddress'));
+export type ValidatedBillingAddress = typeof ValidatedBillingAddress.Type;
+export const ValidatedBillingAddress = Address.pipe(
+  Schema.brand('BillingAddress'),
+);
 
 /**
  * UnvalidatedAddress（未検証の住所）
