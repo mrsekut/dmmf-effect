@@ -59,7 +59,7 @@ export const Order = Schema.Struct({
   customerId: CustomerId,
   shippingAddress: ShippingAddress,
   billingAddress: BillingAddress,
-  orderLines: Schema.Array(OrderLine),
+  orderLines: Schema.NonEmptyArray(OrderLine),
   amountToBill: BillingAmount,
 }).pipe(Schema.brand('Order'));
 
