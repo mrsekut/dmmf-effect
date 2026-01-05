@@ -21,7 +21,7 @@ const program = Effect.gen(function* () {
 
   yield* Effect.log('\n--- 注文1を確定 ---');
   const order1Result = yield* placeOrderWorkflow({
-    customerName: '山田太郎',
+    customerId: '1234567890',
     shippingAddress: {
       street: '東京都渋谷区1-2-3',
       city: '渋谷区',
@@ -46,6 +46,7 @@ const program = Effect.gen(function* () {
         unitPrice: 4500,
       },
     ],
+    amountToBill: 10000,
   });
 
   yield* Effect.log(`注文ID: ${order1Result.order.id}`);
@@ -54,7 +55,7 @@ const program = Effect.gen(function* () {
 
   yield* Effect.log('\n--- 注文2を確定 ---');
   const order2Result = yield* placeOrderWorkflow({
-    customerName: '佐藤花子',
+    customerId: '1234567890',
     shippingAddress: {
       street: '大阪府大阪市北区4-5-6',
       city: '大阪市',
@@ -73,6 +74,7 @@ const program = Effect.gen(function* () {
         unitPrice: 5000,
       },
     ],
+    amountToBill: 10000,
   });
 
   yield* Effect.log(`注文ID: ${order2Result.order.id}`);

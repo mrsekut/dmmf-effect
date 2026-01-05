@@ -2,7 +2,7 @@ import { Schema } from 'effect';
 import * as Domain from './domain';
 
 export type PlaceOrderDTO = {
-  customerName: string;
+  customerId: string;
   shippingAddress: {
     street: string;
     city: string;
@@ -19,6 +19,7 @@ export type PlaceOrderDTO = {
     quantity: number;
     unitPrice: number;
   }[];
+  amountToBill: number;
 };
 
 /**
@@ -26,16 +27,11 @@ export type PlaceOrderDTO = {
  * - 検証など
  */
 export const fromDTO = (dto: PlaceOrderDTO) =>
-  Schema.decodeUnknown(Domain.Order)({
-    orderId: crypto.randomUUID(),
-    customerName: dto.customerName,
+  Schema.decodeUnknown(Domain.ValidatedOrder)({
+    id: crypto.randomUUID(),
+    customerId: dto.customerId,
     shippingAddress: dto.shippingAddress,
     billingAddress: dto.billingAddress,
-    orderLines: dto.orderLines.map(l => ({
-      productId: l.productId,
-      productName: l.productName,
-      quantity: l.quantity,
-      unitPrice: l.unitPrice,
-    })),
-    placedAt: new Date(),
+    orderLines: dto.orderLines,
+    amountToBill: dto.amountToBill,
   });

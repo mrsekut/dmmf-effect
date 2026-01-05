@@ -55,20 +55,6 @@ const OrderLine = Schema.Struct({
 }).pipe(Schema.brand('OrderLine'));
 
 /**
- * 注文 (Aggregate Root)
- * @deprecated
- */
-export type Order = typeof Order.Type;
-export const Order = Schema.Struct({
-  id: OrderId,
-  customerId: CustomerId,
-  shippingAddress: ValidatedShippingAddress,
-  billingAddress: ValidatedBillingAddress,
-  orderLines: Schema.NonEmptyArray(OrderLine),
-  amountToBill: BillingAmount,
-}).pipe(Schema.brand('Order'));
-
-/**
  * UnvalidatedOrderLine（未検証の注文明細行）
  * - プリミティブ型のみ
  */
@@ -83,7 +69,7 @@ export type UnvalidatedOrderLine = {
  * - プリミティブ型のみ（string, number等）
  */
 type UnvalidatedOrder = {
-  orderId: string;
+  id: string;
   customerInfo: UnvalidatedCustomerInfo;
   shippingAddress: UnvalidatedAddress;
   billingAddress: UnvalidatedAddress;
@@ -104,6 +90,11 @@ export const ValidatedOrder = Schema.Struct({
   orderLines: Schema.NonEmptyArray(OrderLine),
   amountToBill: BillingAmount,
 });
+
+/**
+ * 注文 (Aggregate Root)
+ */
+export type Order = UnvalidatedOrder | ValidatedOrder;
 
 /**
  * PlaceOrder ワークフロー
@@ -188,7 +179,7 @@ export type CalculatePrices = (
 /**
  * 注文の合計金額を計算
  */
-export const calculateTotal = (order: Order) => {
+export const calculateTotal = (order: ValidatedOrder) => {
   const total = order.orderLines.reduce(
     (sum, line) => sum + line.price * line.quantity,
     0,
@@ -197,7 +188,7 @@ export const calculateTotal = (order: Order) => {
 };
 
 export const changeOrderLinePrice = (
-  order: Order,
+  order: ValidatedOrder,
   lineId: OrderLineId,
   newPrice: BillingAmount,
 ) => {

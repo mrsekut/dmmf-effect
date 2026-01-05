@@ -1,5 +1,5 @@
 import { Effect, Queue } from 'effect';
-import type { Order } from './domain';
+import type { Order, ValidatedOrder } from './domain';
 import { fromDTO, type PlaceOrderDTO } from './fromDTO';
 import { toDTO } from './toDTO';
 import { OrderEventQueue } from '../queues';
@@ -46,7 +46,7 @@ export const placeOrderWorkflow = (
 /**
  * PlaceOrder Core Workflow
  */
-const placeOrderCore = (order: Order) =>
+const placeOrderCore = (order: ValidatedOrder) =>
   Effect.gen(function* () {
     const orderPlacedEvent = toDTO(order);
 
