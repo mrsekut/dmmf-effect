@@ -1,5 +1,5 @@
 import type { OrderPlacedEvent } from '../events';
-import type { ValidatedOrder } from './domain';
+import type { ValidatedOrder } from './Order';
 
 /**
  * Domain Object → DTO

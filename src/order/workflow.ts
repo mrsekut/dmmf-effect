@@ -1,5 +1,5 @@
 import { Effect, Queue } from 'effect';
-import type { Order, ValidatedOrder } from './domain';
+import type { Order, ValidatedOrder } from './Order';
 import { fromDTO, type PlaceOrderDTO } from './fromDTO';
 import { toDTO } from './toDTO';
 import { OrderEventQueue } from '../queues';
