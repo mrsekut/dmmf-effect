@@ -31,9 +31,8 @@ export const CustomerInfo = Schema.Struct({
  * UnvalidatedCustomerInfo（未検証の顧客情報）
  * - プリミティブ型のみ
  */
-export type UnvalidatedCustomerInfo = typeof UnvalidatedCustomerInfo.Type;
-export const UnvalidatedCustomerInfo = Schema.Struct({
-  customerId: Schema.String,
-  name: Schema.String,
-  email: Schema.String,
-});
+export type UnvalidatedCustomerInfo = {
+  customerId: string;
+  name: string;
+  emailAddress: string;
+};

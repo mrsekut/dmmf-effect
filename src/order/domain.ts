@@ -2,7 +2,7 @@ import { Effect, Schema } from 'effect';
 
 import { ProductCode } from './ProductCode';
 import { OrderQuantity } from './OrderQuantity';
-import { CustomerId, UnvalidatedCustomerInfo } from './Customer';
+import { CustomerId, type UnvalidatedCustomerInfo } from './Customer';
 import { ShippingAddress, BillingAddress, UnvalidatedAddress } from './Address';
 import type { PlaceOrderError, PlaceOrderEvents } from '../events/PlaceOrder';
 
@@ -67,25 +67,23 @@ export const Order = Schema.Struct({
  * UnvalidatedOrderLine（未検証の注文明細行）
  * - プリミティブ型のみ
  */
-export type UnvalidatedOrderLine = typeof UnvalidatedOrderLine.Type;
-export const UnvalidatedOrderLine = Schema.Struct({
-  productCode: Schema.String,
-  quantity: Schema.Number,
-});
+export type UnvalidatedOrderLine = {
+  productCode: string;
+  quantity: number;
+};
 
 /**
  * UnvalidatedOrder（未検証の注文）
  * - 外部から受け取った生の注文データ
  * - プリミティブ型のみ（string, number等）
  */
-type UnvalidatedOrder = typeof UnvalidatedOrder.Type;
-const UnvalidatedOrder = Schema.Struct({
-  orderId: Schema.String,
-  customerInfo: UnvalidatedCustomerInfo,
-  shippingAddress: UnvalidatedAddress,
-  billingAddress: UnvalidatedAddress,
-  orderLines: Schema.Array(UnvalidatedOrderLine),
-});
+type UnvalidatedOrder = {
+  orderId: string;
+  customerInfo: UnvalidatedCustomerInfo;
+  shippingAddress: UnvalidatedAddress;
+  billingAddress: UnvalidatedAddress;
+  orderLines: UnvalidatedOrderLine[];
+};
 
 /**
  * ValidatedOrder（検証済みの注文）
