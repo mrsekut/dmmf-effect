@@ -1,4 +1,5 @@
 import { Schema } from 'effect';
+import { CustomerEmail } from './CustomerEmail';
 
 export type CustomerId = typeof CustomerId.Type;
 export const CustomerId = Schema.String.pipe(Schema.minLength(1)).pipe(
@@ -23,7 +24,7 @@ export type CustomerInfo = typeof CustomerInfo.Type;
 export const CustomerInfo = Schema.Struct({
   id: CustomerId,
   name: CustomerName,
-  emailAddress: Schema.String.pipe(Schema.pattern(/^[^@]+@[^@]+$/)),
+  emailAddress: CustomerEmail,
 });
 
 /**
