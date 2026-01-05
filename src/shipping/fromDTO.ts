@@ -1,5 +1,5 @@
 import { Schema } from 'effect';
-import * as Domain from './domain';
+import * as Domain from './Shipping';
 
 export type ShipOrderDTO = {
   readonly orderReference: string;

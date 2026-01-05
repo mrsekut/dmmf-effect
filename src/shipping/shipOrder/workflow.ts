@@ -1,6 +1,6 @@
 import { Effect, Queue } from 'effect';
-import type { Shipment } from '../domain';
-import { markAsShipped } from '../domain';
+import type { Shipment } from '../Shipping';
+import { markAsShipped } from '../Shipping';
 import { ShippingEventQueue } from '../../queues';
 import type { OrderShippedEvent } from '../../events';
 import type { ParseError } from 'effect/ParseResult';
