@@ -14,10 +14,8 @@ export type PlaceOrderDTO = {
     zipCode: string;
   };
   orderLines: {
-    productId: string;
-    productName: string;
+    productCode: string;
     quantity: number;
-    unitPrice: number;
   }[];
   amountToBill: number;
 };
@@ -37,9 +35,8 @@ export const fromDTO = (dto: PlaceOrderDTO) => {
     orderLines: dto.orderLines.map((line, index) => ({
       id: `${orderId}-line-${index}`,
       orderId: orderId,
-      productCode: line.productId,
+      productCode: line.productCode,
       quantity: line.quantity,
-      price: line.unitPrice,
     })),
     amountToBill: dto.amountToBill,
   });

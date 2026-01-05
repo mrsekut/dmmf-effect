@@ -6,4 +6,4 @@ export * from './Order';
 export * from './Customer';
 export * from './ProductCode';
 export * from './OrderQuantity';
-export { placeOrderWorkflow } from './workflow';
+export { handleOrderTakingCommand } from './workflows/workflow';

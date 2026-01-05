@@ -68,12 +68,12 @@ export type UnvalidatedOrderLine = {
  * - 外部から受け取った生の注文データ
  * - プリミティブ型のみ（string, number等）
  */
-type UnvalidatedOrder = {
-  id: string;
-  customerInfo: UnvalidatedCustomerInfo;
-  shippingAddress: UnvalidatedAddress;
-  billingAddress: UnvalidatedAddress;
-  orderLines: UnvalidatedOrderLine[];
+export type UnvalidatedOrder = {
+  readonly orderId: string;
+  readonly customerInfo: UnvalidatedCustomerInfo;
+  readonly shippingAddress: UnvalidatedAddress;
+  readonly billingAddress: UnvalidatedAddress;
+  readonly orderLines: readonly UnvalidatedOrderLine[];
 };
 
 /**
