@@ -1,11 +1,12 @@
-import type { OrderPlacedEvent } from '../events';
-import type { ValidatedOrder } from './Order';
+import type { OrderPlacedEvent } from '../../../events';
+import type { ValidatedOrder } from '../../Order';
 
 /**
- * Domain Object → DTO
- * - 外部に漏らすべきない情報を落とすなど
+ * CreateOrderPlacedEvent
+ * - ValidatedOrder → OrderPlacedEvent
+ * - ワークフローの出力としてイベントを生成
  */
-export const toDTO = (order: ValidatedOrder) =>
+export const createOrderPlacedEvent = (order: ValidatedOrder) =>
   ({
     type: 'OrderPlaced',
     orderId: order.id,

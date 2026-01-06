@@ -1,9 +1,9 @@
 import { Effect, Queue } from 'effect';
 import type { ParseError } from 'effect/ParseResult';
 import { OrderEventQueue } from '../../../queues';
-import { fromDTO } from '../../fromDTO';
+import { validateOrder } from './validateOrder';
+import { createOrderPlacedEvent } from './createOrderPlacedEvent';
 import type { ValidatedOrder } from '../../Order';
-import { toDTO } from '../../toDTO';
 import type { PlaceOrderCommand } from './command';
 import type { OrderPlacedEvent } from '../../../events';
 
@@ -30,20 +30,11 @@ export const placeOrderWorkflow = (
     // コマンドからUnvalidatedOrderを取り出す
     const unvalidatedOrder = command.data;
 
-    // 入力ゲート: 検証（UnvalidatedOrder → ValidatedOrder）
-    const order = yield* fromDTO({
-      customerInfo: unvalidatedOrder.customerInfo,
-      shippingAddress: unvalidatedOrder.shippingAddress,
-      billingAddress: unvalidatedOrder.billingAddress,
-      orderLines: unvalidatedOrder.orderLines.map(l => ({
-        productCode: l.productCode,
-        quantity: l.quantity,
-        price: l.price,
-      })),
-    });
+    // Step 1: バリデーション（UnvalidatedOrder → ValidatedOrder）
+    const validatedOrder = yield* validateOrder(unvalidatedOrder);
 
-    // ワークフロー実行
-    const result = yield* placeOrderCore(order);
+    // Step 2: ワークフロー実行（将来的に Price → Acknowledge を追加）
+    const result = yield* placeOrderCore(validatedOrder);
 
     // イベントをキューに送信
     const queue = yield* OrderEventQueue;
@@ -55,6 +46,7 @@ export const placeOrderWorkflow = (
 
     return result;
   });
+
 /**
  * PlaceOrder Core Workflow
  * - パイプラインの各ステップはステートレスで副作用がないように設計
@@ -62,7 +54,8 @@ export const placeOrderWorkflow = (
  */
 const placeOrderCore = (order: ValidatedOrder) =>
   Effect.gen(function* () {
-    const orderPlacedEvent = toDTO(order);
+    // Step 3: イベント生成
+    const orderPlacedEvent = createOrderPlacedEvent(order);
 
     return {
       order,
