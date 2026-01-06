@@ -1,5 +1,5 @@
 import { Schema } from 'effect';
-import { CustomerId, ProductCode, OrderQuantity } from '../order';
+import { CustomerInfo, ProductCode, OrderQuantity } from '../order';
 
 /**
  * 発送ID
@@ -53,7 +53,7 @@ const PendingShipment = Schema.Struct({
   status: Schema.Literal('pending'),
   shipmentId: ShipmentId,
   orderReference: OrderReference,
-  customerId: CustomerId,
+  customerInfo: CustomerInfo,
   shippingAddress: ShippingAddress,
   items: Schema.Array(ShipmentItem),
 });
@@ -63,7 +63,7 @@ const ShippedShipment = Schema.Struct({
   status: Schema.Literal('shipped'),
   shipmentId: ShipmentId,
   orderReference: OrderReference,
-  customerId: CustomerId,
+  customerInfo: CustomerInfo,
   shippingAddress: ShippingAddress,
   items: Schema.Array(ShipmentItem),
   trackingNumber: TrackingNumber,
@@ -75,7 +75,7 @@ const DeliveredShipment = Schema.Struct({
   status: Schema.Literal('delivered'),
   shipmentId: ShipmentId,
   orderReference: OrderReference,
-  customerId: CustomerId,
+  customerInfo: CustomerInfo,
   shippingAddress: ShippingAddress,
   items: Schema.Array(ShipmentItem),
   trackingNumber: TrackingNumber,

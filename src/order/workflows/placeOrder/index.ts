@@ -40,10 +40,6 @@ export const placeOrderWorkflow = (
         quantity: l.quantity,
         price: l.price,
       })),
-      amountToBill: unvalidatedOrder.orderLines.reduce(
-        (sum, l) => sum + l.quantity * l.price,
-        0,
-      ),
     });
 
     // ワークフロー実行

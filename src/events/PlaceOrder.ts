@@ -13,7 +13,11 @@ type AcknowledgmentSentEvent = {
 export type OrderPlacedEvent = {
   type: 'OrderPlaced';
   orderId: string;
-  customerId: string;
+  customerInfo: {
+    firstName: string;
+    lastName: string;
+    emailAddress: string;
+  };
   shippingAddress: {
     street: string;
     city: string;

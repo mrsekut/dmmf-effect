@@ -9,7 +9,11 @@ export const toDTO = (order: ValidatedOrder) =>
   ({
     type: 'OrderPlaced',
     orderId: order.id,
-    customerId: order.customerInfo.id,
+    customerInfo: {
+      firstName: order.customerInfo.name.firstName,
+      lastName: order.customerInfo.name.lastName,
+      emailAddress: order.customerInfo.emailAddress,
+    },
     shippingAddress: order.shippingAddress,
     orderLines: order.orderLines.map(l => ({
       productId: l.productCode,

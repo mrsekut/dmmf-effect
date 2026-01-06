@@ -33,8 +33,8 @@ it.effect(
         createPlaceOrderCommand({
           orderId: crypto.randomUUID(),
           customerInfo: {
-            id: '1234567890',
-            name: 'テスト顧客',
+            firstName: 'テスト',
+            lastName: '顧客',
             emailAddress: 'test@example.com',
           },
           shippingAddress: {
@@ -87,8 +87,8 @@ it.effect('複数の注文を順次処理できる', () =>
       createPlaceOrderCommand({
         orderId: crypto.randomUUID(),
         customerInfo: {
-          id: '1234567890',
-          name: 'テスト顧客1',
+          firstName: 'テスト',
+          lastName: '顧客1',
           emailAddress: 'test1@example.com',
         },
         shippingAddress: {
@@ -117,8 +117,8 @@ it.effect('複数の注文を順次処理できる', () =>
       createPlaceOrderCommand({
         orderId: crypto.randomUUID(),
         customerInfo: {
-          id: '1234567890',
-          name: 'テスト顧客2',
+          firstName: 'テスト',
+          lastName: '顧客2',
           emailAddress: 'test2@example.com',
         },
         shippingAddress: {

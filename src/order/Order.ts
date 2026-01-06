@@ -2,13 +2,7 @@ import { Effect, Schema, Array } from 'effect';
 
 import { ProductCode } from './ProductCode';
 import { OrderQuantity } from './OrderQuantity';
-import {
-  CustomerInfo,
-  CustomerId,
-  CustomerName,
-  type UnvalidatedCustomerInfo,
-} from './Customer';
-import { CustomerEmail } from './CustomerEmail';
+import { CustomerInfo, type UnvalidatedCustomerInfo } from './Customer';
 import {
   ValidatedShippingAddress,
   ValidatedBillingAddress,
@@ -217,10 +211,12 @@ if (import.meta.vitest) {
     });
 
   const createCustomerInfo = () =>
-    CustomerInfo.make({
-      id: CustomerId.make('customer-1'),
-      name: CustomerName.make('Test Customer'),
-      emailAddress: Schema.decodeSync(CustomerEmail)('test@example.com'),
+    Schema.decodeSync(CustomerInfo)({
+      name: {
+        firstName: 'Test',
+        lastName: 'Customer',
+      },
+      emailAddress: 'test@example.com',
     });
 
   const createValidatedOrder = (

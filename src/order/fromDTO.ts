@@ -3,8 +3,8 @@ import * as Domain from './Order';
 
 export type PlaceOrderDTO = {
   customerInfo: {
-    id: string;
-    name: string;
+    firstName: string;
+    lastName: string;
     emailAddress: string;
   };
   shippingAddress: {
@@ -22,7 +22,6 @@ export type PlaceOrderDTO = {
     quantity: number;
     price: number;
   }[];
-  amountToBill: number;
 };
 
 /**
@@ -34,7 +33,13 @@ export const fromDTO = (dto: PlaceOrderDTO) => {
   return Schema.decodeUnknown(Domain.ValidatedOrder)({
     type: 'ValidatedOrder',
     id: orderId,
-    customerInfo: dto.customerInfo,
+    customerInfo: {
+      name: {
+        firstName: dto.customerInfo.firstName,
+        lastName: dto.customerInfo.lastName,
+      },
+      emailAddress: dto.customerInfo.emailAddress,
+    },
     shippingAddress: dto.shippingAddress,
     billingAddress: dto.billingAddress,
     orderLines: dto.orderLines.map((line, index) => ({

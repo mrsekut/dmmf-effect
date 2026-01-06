@@ -3,7 +3,11 @@ import * as Domain from './Shipping';
 
 export type ShipOrderDTO = {
   readonly orderReference: string;
-  readonly customerId: string;
+  readonly customerInfo: {
+    readonly firstName: string;
+    readonly lastName: string;
+    readonly emailAddress: string;
+  };
   readonly shippingAddress: {
     readonly street: string;
     readonly city: string;
@@ -24,7 +28,13 @@ export const fromDTO = (command: ShipOrderDTO) =>
     status: 'pending',
     shipmentId: crypto.randomUUID(),
     orderReference: command.orderReference,
-    customerId: command.customerId,
+    customerInfo: {
+      name: {
+        firstName: command.customerInfo.firstName,
+        lastName: command.customerInfo.lastName,
+      },
+      emailAddress: command.customerInfo.emailAddress,
+    },
     shippingAddress: command.shippingAddress,
     items: command.items,
   });
