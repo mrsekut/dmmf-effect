@@ -87,65 +87,6 @@ export type PlaceOrder = (
   uo: UnvalidatedOrder,
 ) => Effect.Effect<PlaceOrderEvent, PlaceOrderError>;
 
-/**
- * EnvelopeContents（メールの内容）
- */
-type EnvelopeContents = typeof EnvelopeContents.Type;
-const EnvelopeContents = Schema.String.pipe(Schema.brand('EnvelopeContents'));
-
-/**
- * QuoteForm（見積依頼フォーム）
- */
-type QuoteForm = typeof QuoteForm.Type;
-const QuoteForm = Schema.Struct({
-  type: Schema.Literal('QuoteForm'),
-  // TODO:
-});
-
-/**
- * OrderForm（注文フォーム）
- */
-type OrderForm = typeof OrderForm.Type;
-const OrderForm = Schema.Struct({
-  type: Schema.Literal('OrderForm'),
-  // TODO:
-});
-
-/**
- * CategorizedMail（分類済みのメール）
- * - 出力に複数の選択肢がある場合、選択型を作成
- */
-type CategorizedMail = typeof CategorizedMail.Type;
-const CategorizedMail = Schema.Union(QuoteForm, OrderForm);
-
-/**
- * CategorizeInboundMail ワークフロー
- * - 受信メールの分類
- */
-export type CategorizeInboundMail = (c: EnvelopeContents) => CategorizedMail;
-
-// ============================================
-// 複数入力のモデリング
-// ============================================
-
-/**
- * ProductCatalog（製品カタログ）
- * - 依存関係として注入される
- */
-type ProductCatalog = typeof ProductCatalog.Type;
-const ProductCatalog = Schema.Struct({
-  type: Schema.Literal('ProductCatalog'),
-  // TODO:
-});
-
-/**
- * CalculatePrices ワークフロー（別々のパラメーター版）
- * - ProductCatalogが「本当の」入力ではなく依存関係にあるので、本当はDIしたい
- */
-export type CalculatePrices = (
-  o: OrderForm,
-) => (c: ProductCatalog) => PricedOrder;
-
 // ============================================
 // Domain Logic
 // ============================================
