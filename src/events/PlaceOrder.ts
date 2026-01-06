@@ -39,15 +39,12 @@ type BillableOrderPlacedEvent = {
 };
 
 /**
- * PlaceOrderEvents（注文確定イベント）
- * - ワークフローが成功したときのイベント型
- * - ワークフローが複数の出力を持つ場合、レコード型でまとめる
+ * PlaceOrderEvent（注文確定イベント）
  */
-export type PlaceOrderEvents = {
-  acknowledgmentSent: AcknowledgmentSentEvent;
-  orderPlaced: OrderPlacedEvent;
-  billableOrderPlaced: BillableOrderPlacedEvent;
-};
+export type PlaceOrderEvent =
+  | AcknowledgmentSentEvent
+  | OrderPlacedEvent
+  | BillableOrderPlacedEvent;
 
 /**
  * ValidationError（検証エラー）

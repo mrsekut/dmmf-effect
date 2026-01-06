@@ -8,7 +8,7 @@ import {
   ValidatedBillingAddress,
   UnvalidatedAddress,
 } from './Address';
-import type { PlaceOrderError, PlaceOrderEvents } from '../events/PlaceOrder';
+import type { PlaceOrderError, PlaceOrderEvent } from '../events/PlaceOrder';
 import {
   type UnvalidatedOrderLine,
   OrderLine,
@@ -85,7 +85,7 @@ export type Order = UnvalidatedOrder | ValidatedOrder;
  */
 export type PlaceOrder = (
   uo: UnvalidatedOrder,
-) => Effect.Effect<PlaceOrderEvents, PlaceOrderError>;
+) => Effect.Effect<PlaceOrderEvent, PlaceOrderError>;
 
 /**
  * EnvelopeContents（メールの内容）
