@@ -2,7 +2,11 @@ import { Schema } from 'effect';
 import * as Domain from './Order';
 
 export type PlaceOrderDTO = {
-  customerId: string;
+  customerInfo: {
+    id: string;
+    name: string;
+    emailAddress: string;
+  };
   shippingAddress: {
     street: string;
     city: string;
@@ -30,7 +34,7 @@ export const fromDTO = (dto: PlaceOrderDTO) => {
   return Schema.decodeUnknown(Domain.ValidatedOrder)({
     type: 'ValidatedOrder',
     id: orderId,
-    customerId: dto.customerId,
+    customerInfo: dto.customerInfo,
     shippingAddress: dto.shippingAddress,
     billingAddress: dto.billingAddress,
     orderLines: dto.orderLines.map((line, index) => ({
@@ -40,6 +44,5 @@ export const fromDTO = (dto: PlaceOrderDTO) => {
       quantity: line.quantity,
       price: line.price,
     })),
-    amountToBill: dto.amountToBill,
   });
 };

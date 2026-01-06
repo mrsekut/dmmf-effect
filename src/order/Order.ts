@@ -2,7 +2,13 @@ import { Effect, Schema, Array } from 'effect';
 
 import { ProductCode } from './ProductCode';
 import { OrderQuantity } from './OrderQuantity';
-import { CustomerId, type UnvalidatedCustomerInfo } from './Customer';
+import {
+  CustomerInfo,
+  CustomerId,
+  CustomerName,
+  type UnvalidatedCustomerInfo,
+} from './Customer';
+import { CustomerEmail } from './CustomerEmail';
 import {
   ValidatedShippingAddress,
   ValidatedBillingAddress,
@@ -54,7 +60,20 @@ export type ValidatedOrder = typeof ValidatedOrder.Type;
 export const ValidatedOrder = Schema.Struct({
   type: Schema.Literal('ValidatedOrder'),
   id: OrderId,
-  customerId: CustomerId,
+  customerInfo: CustomerInfo,
+  shippingAddress: ValidatedShippingAddress,
+  billingAddress: ValidatedBillingAddress,
+  orderLines: Schema.NonEmptyArray(OrderLine),
+});
+
+/**
+ * PricedOrder（価格計算済みの注文）
+ */
+type PricedOrder = typeof PricedOrder.Type;
+const PricedOrder = Schema.Struct({
+  type: Schema.Literal('PricedOrder'),
+  id: OrderId,
+  customerInfo: CustomerInfo,
   shippingAddress: ValidatedShippingAddress,
   billingAddress: ValidatedBillingAddress,
   orderLines: Schema.NonEmptyArray(OrderLine),
@@ -126,15 +145,6 @@ const ProductCatalog = Schema.Struct({
 });
 
 /**
- * PricedOrder（価格計算済みの注文）
- */
-type PricedOrder = typeof PricedOrder.Type;
-const PricedOrder = Schema.Struct({
-  type: Schema.Literal('PricedOrder'),
-  // TODO:
-});
-
-/**
  * CalculatePrices ワークフロー（別々のパラメーター版）
  * - ProductCatalogが「本当の」入力ではなく依存関係にあるので、本当はDIしたい
  */
@@ -146,19 +156,8 @@ export type CalculatePrices = (
 // Domain Logic
 // ============================================
 
-/**
- * 注文の合計金額を計算
- */
-const calculateTotal = (order: ValidatedOrder) => {
-  const total = order.orderLines.reduce(
-    (sum, line) => sum + line.price * line.quantity,
-    0,
-  );
-  return BillingAmount.make(total);
-};
-
 export const changeOrderLinePrice = (
-  order: ValidatedOrder,
+  order: PricedOrder,
   lineId: OrderLineId,
   newPrice: Price,
 ) => {
@@ -170,10 +169,21 @@ export const changeOrderLinePrice = (
     orderLines: Array.map(order.orderLines, updateLine),
   };
 
-  return ValidatedOrder.make({
+  return PricedOrder.make({
     ...updatedOrder,
     amountToBill: calculateTotal(updatedOrder),
   });
+};
+
+/**
+ * 注文の合計金額を計算
+ */
+const calculateTotal = (order: PricedOrder) => {
+  const total = order.orderLines.reduce(
+    (sum, line) => sum + line.price * line.quantity,
+    0,
+  );
+  return BillingAmount.make(total);
 };
 
 if (import.meta.vitest) {
@@ -206,14 +216,21 @@ if (import.meta.vitest) {
       zipCode: '123-4567',
     });
 
+  const createCustomerInfo = () =>
+    CustomerInfo.make({
+      id: CustomerId.make('customer-1'),
+      name: CustomerName.make('Test Customer'),
+      emailAddress: Schema.decodeSync(CustomerEmail)('test@example.com'),
+    });
+
   const createValidatedOrder = (
     orderLines: Array.NonEmptyArray<OrderLine>,
     amountToBill = 0,
   ) =>
-    ValidatedOrder.make({
-      type: 'ValidatedOrder',
+    PricedOrder.make({
+      type: 'PricedOrder',
       id: OrderId.make('order-1'),
-      customerId: CustomerId.make('customer-1'),
+      customerInfo: createCustomerInfo(),
       shippingAddress: createAddress(),
       billingAddress: createBillingAddress(),
       orderLines,

@@ -32,7 +32,7 @@ export const CustomerInfo = Schema.Struct({
  * - プリミティブ型のみ
  */
 export type UnvalidatedCustomerInfo = {
-  customerId: string;
+  id: string;
   name: string;
   emailAddress: string;
 };

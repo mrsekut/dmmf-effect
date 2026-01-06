@@ -32,7 +32,7 @@ export const placeOrderWorkflow = (
 
     // 入力ゲート: 検証（UnvalidatedOrder → ValidatedOrder）
     const order = yield* fromDTO({
-      customerId: unvalidatedOrder.customerInfo.customerId,
+      customerInfo: unvalidatedOrder.customerInfo,
       shippingAddress: unvalidatedOrder.shippingAddress,
       billingAddress: unvalidatedOrder.billingAddress,
       orderLines: unvalidatedOrder.orderLines.map(l => ({
