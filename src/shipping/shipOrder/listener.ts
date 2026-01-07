@@ -25,9 +25,9 @@ export const startShippingEventListener = Effect.gen(function* () {
  */
 const handleOrderPlacedEvent = (event: OrderPlacedEvent) =>
   Effect.gen(function* () {
-    yield* Effect.log(`Received OrderPlaced event: ${event.orderId}`);
+    yield* Effect.log(`Received OrderPlaced event: ${event.id}`);
 
-    // 腐敗防止層: イベント → コマンド変換
+    // 腐敗防止層: イベント → コマンド変換（ドメイン型 → DTO）
     const command = fromOrderPlacedEvent(event);
 
     // ワークフロー実行
@@ -39,14 +39,18 @@ const handleOrderPlacedEvent = (event: OrderPlacedEvent) =>
  *
  * - これが腐敗防止層の役割を果たす
  * - 受注コンテキストの語彙を発送コンテキストの語彙に翻訳
+ * - ドメイン型からプリミティブ型（DTO）への変換
  */
-const fromOrderPlacedEvent = (event: OrderPlacedEvent) =>
-  ({
-    orderReference: event.orderId,
-    customerInfo: event.customerInfo,
-    shippingAddress: event.shippingAddress,
-    items: event.orderLines.map(line => ({
-      productId: line.productId,
-      quantity: line.quantity,
-    })),
-  }) as const satisfies ShipOrderDTO;
+const fromOrderPlacedEvent = (event: OrderPlacedEvent): ShipOrderDTO => ({
+  orderReference: event.id,
+  customerInfo: {
+    firstName: event.customerInfo.name.firstName,
+    lastName: event.customerInfo.name.lastName,
+    emailAddress: event.customerInfo.emailAddress,
+  },
+  shippingAddress: event.shippingAddress,
+  items: event.orderLines.map(line => ({
+    productId: line.productCode,
+    quantity: line.quantity,
+  })),
+});

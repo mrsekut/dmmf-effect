@@ -3,8 +3,8 @@ import { Schema } from 'effect';
 /**
  * 住所 (Value Object)
  */
-type Address = typeof Address.Type;
-const Address = Schema.Struct({
+export type Address = typeof Address.Type;
+export const Address = Schema.Struct({
   street: Schema.String.pipe(Schema.minLength(1)),
   city: Schema.String.pipe(Schema.minLength(1)),
   zipCode: Schema.String.pipe(Schema.pattern(/^\d{3}-?\d{4}$/)),

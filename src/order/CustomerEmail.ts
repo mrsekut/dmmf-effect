@@ -1,6 +1,7 @@
 import { Schema } from 'effect';
 
-const EmailAddress = Schema.String.pipe(Schema.pattern(/^[^@]+@[^@]+$/));
+export type EmailAddress = typeof EmailAddress.Type;
+export const EmailAddress = Schema.String.pipe(Schema.pattern(/^[^@]+@[^@]+$/));
 
 export type UnverifiedEmailAddress = typeof UnverifiedEmailAddress.Type;
 const UnverifiedEmailAddress = EmailAddress.pipe(

@@ -1,48 +1,31 @@
-/**
- * AcknowledgmentSent（確認送信済み）イベント
- */
-type AcknowledgmentSentEvent = {
-  type: 'AcknowledgmentSent';
-  orderId: string;
-  emailAddress: string;
-};
+import type { BillingAmount, OrderId, PricedOrder } from '../order';
+import type { Address } from '../order/Address';
+import type { OrderAcknowledgmentSentEvent } from '../order/workflows/placeOrder/acknowledgeOrder';
 
 /**
  * OrderPlaced（注文確定）イベント
+ * - F#: type OrderPlaced = PricedOrder
+ * - 現在はPricingステップ未実装のためValidatedOrderを使用
  */
 export type OrderPlacedEvent = {
   type: 'OrderPlaced';
-  orderId: string;
-  customerInfo: {
-    firstName: string;
-    lastName: string;
-    emailAddress: string;
-  };
-  shippingAddress: {
-    street: string;
-    city: string;
-    zipCode: string;
-  };
-  orderLines: {
-    productId: string;
-    quantity: number;
-  }[];
-};
+} & Omit<PricedOrder, 'type'>;
 
 /**
  * BillableOrderPlaced（請求可能な注文確定）イベント
  */
 type BillableOrderPlacedEvent = {
   type: 'BillableOrderPlaced';
-  orderId: string;
-  billingAmount: number;
+  orderId: OrderId;
+  billingAddress: Address;
+  amountToBill: BillingAmount;
 };
 
 /**
  * PlaceOrderEvent（注文確定イベント）
  */
 export type PlaceOrderEvent =
-  | AcknowledgmentSentEvent
+  | OrderAcknowledgmentSentEvent
   | OrderPlacedEvent
   | BillableOrderPlacedEvent;
 

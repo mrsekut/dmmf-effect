@@ -2,10 +2,21 @@ import { Effect, Queue } from 'effect';
 import type { ParseError } from 'effect/ParseResult';
 import { OrderEventQueue } from '../../../queues';
 import { validateOrder } from './validateOrder';
-import { createOrderPlacedEvent } from './createOrderPlacedEvent';
-import type { ValidatedOrder } from '../../Order';
+import type { UnvalidatedOrder, ValidatedOrder } from '../../Order';
 import type { PlaceOrderCommand } from './command';
-import type { OrderPlacedEvent } from '../../../events';
+import type {
+  OrderPlacedEvent,
+  PlaceOrderError,
+  PlaceOrderEvent,
+} from '../../../events';
+
+/**
+ * PlaceOrder ワークフロー
+ * - 「注文確定」プロセス
+ */
+export type PlaceOrder = (
+  uo: UnvalidatedOrder,
+) => Effect.Effect<PlaceOrderEvent, PlaceOrderError>;
 
 type PlaceOrderResult = {
   readonly order: ValidatedOrder;
@@ -55,10 +66,10 @@ export const placeOrderWorkflow = (
 const placeOrderCore = (order: ValidatedOrder) =>
   Effect.gen(function* () {
     // Step 3: イベント生成
-    const orderPlacedEvent = createOrderPlacedEvent(order);
+    // const orderPlacedEvent = createOrderPlacedEvent(order);
 
     return {
       order,
-      events: [orderPlacedEvent],
+      events: [],
     } as const satisfies PlaceOrderResult;
   });

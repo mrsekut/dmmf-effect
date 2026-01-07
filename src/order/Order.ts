@@ -1,4 +1,4 @@
-import { Effect, Schema, Array } from 'effect';
+import { Schema, Array } from 'effect';
 
 import { ProductCode } from './ProductCode';
 import { OrderQuantity } from './OrderQuantity';
@@ -8,7 +8,6 @@ import {
   ValidatedBillingAddress,
   UnvalidatedAddress,
 } from './Address';
-import type { PlaceOrderError, PlaceOrderEvent } from '../events/PlaceOrder';
 import {
   type UnvalidatedOrderLine,
   OrderLine,
@@ -63,8 +62,8 @@ export const ValidatedOrder = Schema.Struct({
 /**
  * PricedOrder（価格計算済みの注文）
  */
-type PricedOrder = typeof PricedOrder.Type;
-const PricedOrder = Schema.Struct({
+export type PricedOrder = typeof PricedOrder.Type;
+export const PricedOrder = Schema.Struct({
   type: Schema.Literal('PricedOrder'),
   id: OrderId,
   customerInfo: CustomerInfo,
@@ -78,14 +77,6 @@ const PricedOrder = Schema.Struct({
  * 注文 (Aggregate Root)
  */
 export type Order = UnvalidatedOrder | ValidatedOrder;
-
-/**
- * PlaceOrder ワークフロー
- * - 「注文確定」プロセス
- */
-export type PlaceOrder = (
-  uo: UnvalidatedOrder,
-) => Effect.Effect<PlaceOrderEvent, PlaceOrderError>;
 
 // ============================================
 // Domain Logic
