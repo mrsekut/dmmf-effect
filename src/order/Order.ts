@@ -3,11 +3,7 @@ import { Schema, Array } from 'effect';
 import { ProductCode } from './ProductCode';
 import { OrderQuantity } from './OrderQuantity';
 import { CustomerInfo, type UnvalidatedCustomerInfo } from './Customer';
-import {
-  ValidatedShippingAddress,
-  ValidatedBillingAddress,
-  UnvalidatedAddress,
-} from './Address';
+import { UnvalidatedAddress, Address } from './Address';
 import {
   type UnvalidatedOrderLine,
   OrderLine,
@@ -57,8 +53,8 @@ export const ValidatedOrder = Schema.Struct({
   type: Schema.Literal('ValidatedOrder'),
   id: OrderId,
   customerInfo: CustomerInfo,
-  shippingAddress: ValidatedShippingAddress,
-  billingAddress: ValidatedBillingAddress,
+  shippingAddress: Address,
+  billingAddress: Address,
   orderLines: Schema.NonEmptyArray(OrderLine),
 });
 
@@ -70,8 +66,8 @@ export const PricedOrder = Schema.Struct({
   type: Schema.Literal('PricedOrder'),
   id: OrderId,
   customerInfo: CustomerInfo,
-  shippingAddress: ValidatedShippingAddress,
-  billingAddress: ValidatedBillingAddress,
+  shippingAddress: Address,
+  billingAddress: Address,
   orderLines: Schema.NonEmptyArray(OrderLine),
   amountToBill: BillingAmount,
 });
@@ -132,14 +128,14 @@ if (import.meta.vitest) {
     });
 
   const createAddress = () =>
-    ValidatedShippingAddress.make({
+    Address.make({
       street: 'Test Street',
       city: 'Test City',
       zipCode: '123-4567',
     });
 
   const createBillingAddress = () =>
-    ValidatedBillingAddress.make({
+    Address.make({
       street: 'Test Street',
       city: 'Test City',
       zipCode: '123-4567',

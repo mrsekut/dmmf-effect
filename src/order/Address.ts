@@ -11,22 +11,6 @@ export const Address = Schema.Struct({
 }).pipe(Schema.brand('Address'));
 
 /**
- * ShippingAddress（配送先住所）
- */
-export type ValidatedShippingAddress = typeof ValidatedShippingAddress.Type;
-export const ValidatedShippingAddress = Address.pipe(
-  Schema.brand('ValidatedShippingAddress'),
-);
-
-/**
- * BillingAddress（請求先住所）
- */
-export type ValidatedBillingAddress = typeof ValidatedBillingAddress.Type;
-export const ValidatedBillingAddress = Address.pipe(
-  Schema.brand('BillingAddress'),
-);
-
-/**
  * UnvalidatedAddress（未検証の住所）
  * - プリミティブ型のみ
  */
@@ -36,3 +20,11 @@ export const UnvalidatedAddress = Schema.Struct({
   city: Schema.String,
   zipCode: Schema.String,
 });
+
+export const toAddress = (checkedAddress: UnvalidatedAddress) => {
+  return Address.make({
+    street: checkedAddress.street,
+    city: checkedAddress.city,
+    zipCode: checkedAddress.zipCode,
+  });
+};
