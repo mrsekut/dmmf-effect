@@ -1,6 +1,6 @@
-import { Schema } from 'effect';
-import { OrderQuantity } from './OrderQuantity';
-import { ProductCode } from './ProductCode';
+import { Effect, Schema } from 'effect';
+import { mkOrderQuantity, OrderQuantity } from './OrderQuantity';
+import { ProductCode, toProductCode } from './ProductCode';
 
 /**
  * Price（価格）
@@ -26,11 +26,24 @@ export const OrderLine = Schema.Struct({
   id: OrderLineId,
   productCode: ProductCode,
   quantity: OrderQuantity,
-  price: Price,
 }).pipe(Schema.brand('OrderLine'));
 
 export type UnvalidatedOrderLine = {
+  id: string;
   productCode: string;
   quantity: number;
-  price: number;
 };
+
+export function toValidatedOrderLine(uol: UnvalidatedOrderLine) {
+  return Effect.gen(function* () {
+    const id = OrderLineId.make(uol.id);
+    const productCode = yield* toProductCode(uol.productCode);
+    const quantity = mkOrderQuantity(productCode, uol.quantity);
+
+    return OrderLine.make({
+      id,
+      productCode,
+      quantity,
+    });
+  });
+}

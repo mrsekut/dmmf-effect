@@ -7,20 +7,18 @@ import { parseError } from 'effect/ParseResult';
  * - "W" で始まる4桁のコード
  */
 type WidgetCode = typeof WidgetCode.Type;
-const WidgetCode = Schema.String.pipe(
-  Schema.pattern(/^W\d{4}$/),
-  Schema.brand('WidgetCode'),
-);
+const WidgetCode = Schema.TaggedStruct('Widget', {
+  code: Schema.String.pipe(Schema.pattern(/^W\d{4}$/)),
+});
 
 /**
  * GizmoCode（ギズモコード）
  * - "G" で始まる3桁のコード
  */
 type GizmoCode = typeof GizmoCode.Type;
-const GizmoCode = Schema.String.pipe(
-  Schema.pattern(/^G\d{3}$/),
-  Schema.brand('GizmoCode'),
-);
+const GizmoCode = Schema.TaggedStruct('Gizmo', {
+  code: Schema.String.pipe(Schema.pattern(/^G\d{3}$/)),
+});
 
 /**
  * ProductCode （商品コード）

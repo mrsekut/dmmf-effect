@@ -1,4 +1,5 @@
 import { Schema } from 'effect';
+import type { ProductCode } from './ProductCode';
 
 /**
  * UnitQuantity（個数）
@@ -25,3 +26,12 @@ const KilogramQuantity = Schema.Number.pipe(
  */
 export type OrderQuantity = typeof OrderQuantity.Type;
 export const OrderQuantity = Schema.Union(UnitQuantity, KilogramQuantity);
+
+export function mkOrderQuantity(productCode: ProductCode, quantity: number) {
+  switch (productCode._tag) {
+    case 'Widget':
+      return UnitQuantity.make(quantity);
+    case 'Gizmo':
+      return KilogramQuantity.make(quantity);
+  }
+}
