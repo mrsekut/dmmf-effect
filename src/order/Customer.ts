@@ -1,5 +1,5 @@
 import { Schema } from 'effect';
-import { CustomerEmail } from './CustomerEmail';
+import { EmailAddress } from './CustomerEmail';
 
 /**
  * String50
@@ -22,11 +22,10 @@ export const PersonalName = Schema.Struct({
 /**
  * CustomerInfo （顧客情報）
  * - ValueObjectである
- */
-export type CustomerInfo = typeof CustomerInfo.Type;
+ */ export type CustomerInfo = typeof CustomerInfo.Type;
 export const CustomerInfo = Schema.Struct({
   name: PersonalName,
-  emailAddress: CustomerEmail,
+  emailAddress: EmailAddress,
 });
 
 /**
@@ -36,4 +35,14 @@ export type UnvalidatedCustomerInfo = {
   firstName: string;
   lastName: string;
   emailAddress: string;
+};
+
+export const toCustomerInfo = (uo: UnvalidatedCustomerInfo) => {
+  return CustomerInfo.make({
+    name: {
+      firstName: String50.make(uo.firstName),
+      lastName: String50.make(uo.lastName),
+    },
+    emailAddress: EmailAddress.make(uo.emailAddress),
+  });
 };
