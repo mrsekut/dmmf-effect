@@ -20,7 +20,10 @@ import {
  * - 空でない文字列
  */
 export type OrderId = typeof OrderId.Type;
-export const OrderId = Schema.NonEmptyString.pipe(Schema.brand('OrderId'));
+export const OrderId = Schema.NonEmptyString.pipe(
+  Schema.maxLength(50, { message: () => 'OrderIdは50文字以内です' }),
+  Schema.brand('OrderId'),
+);
 
 /**
  * BillingAmount（請求金額）
