@@ -1,79 +1,79 @@
-import { Context, Effect, Schema } from 'effect';
-import { ValidatedOrder, type UnvalidatedOrder } from '../../Order';
-import type { ProductCode } from '../../ProductCode';
-import { UnvalidatedAddress } from '../../Address';
-
-/**
- * deps1: CheckProductCodeExists
- *  ローカルで実行され、かつ失敗の可能性もないので、返り値はEffectである必要がない
- */
-class CheckProductCodeExists extends Context.Tag('CheckProductCodeExists')<
-  CheckProductCodeExists,
-  {
-    readonly checkProductCodeExists: (c: ProductCode) => boolean;
-  }
->() {}
-
-/** deps2: CheckAddressExists */
-class CheckAddressExists extends Context.Tag('CheckAddressExists')<
-  CheckAddressExists,
-  {
-    readonly checkAddressExists: (
-      a: UnvalidatedAddress,
-    ) => Effect.Effect<CheckedAddress, AddressValidationError>;
-  }
->() {}
-
-type CheckedAddress = typeof CheckedAddress.Type;
-const CheckedAddress = UnvalidatedAddress.pipe(Schema.brand('CheckedAddress'));
-
-class AddressValidationError extends Schema.TaggedError<AddressValidationError>()(
-  'AddressValidationError',
-  { message: Schema.String },
-) {}
+import { Array, Effect, Schema, ParseResult, pipe } from 'effect';
+import { OrderId, ValidatedOrder, type UnvalidatedOrder } from '../../Order';
+import { toAddress, UnvalidatedAddress } from '../../Address';
+import { toCustomerInfo } from '../../Customer';
+import { OrderLine, toValidatedOrderLine } from '../../OrderLine';
+import type { CheckProductCodeExists } from '../../CheckProductCodeExists';
 
 /**
  * ValidateOrder
  */
-export type ValidateOrder = <E>(
+type ValidateOrder = (
   uo: UnvalidatedOrder,
 ) => Effect.Effect<
   ValidatedOrder,
-  E | ValidationError[],
+  ParseResult.ParseError,
   CheckAddressExists | CheckProductCodeExists
 >;
 
-class ValidationError extends Schema.TaggedError<ValidationError>()(
-  'ValidationError',
-  { message: Schema.String },
-) {}
+export const validateOrder: ValidateOrder = uo => {
+  return Effect.gen(function* () {
+    const id = OrderId.make(uo.orderId);
+    const customerInfo = toCustomerInfo(uo.customerInfo);
 
-/**
- * ValidateOrder
- * TODO: ValidateOrder を実装する
- * - UnvalidatedOrder → ValidatedOrder
- * - ワークフローの最初のステップ
- */
-export const validateOrder = (unvalidatedOrder: UnvalidatedOrder) => {
-  const orderId = crypto.randomUUID();
+    const shippingAddress = yield* pipe(
+      uo.shippingAddress,
+      toCheckedAddress,
+      Effect.map(toAddress),
+    );
+    const billingAddress = yield* pipe(
+      uo.billingAddress,
+      toCheckedAddress,
+      Effect.map(toAddress),
+    );
 
-  return Schema.decodeUnknown(ValidatedOrder)({
-    type: 'ValidatedOrder',
-    id: orderId,
-    customerInfo: {
-      name: {
-        firstName: unvalidatedOrder.customerInfo.firstName,
-        lastName: unvalidatedOrder.customerInfo.lastName,
-      },
-      emailAddress: unvalidatedOrder.customerInfo.emailAddress,
-    },
-    shippingAddress: unvalidatedOrder.shippingAddress,
-    billingAddress: unvalidatedOrder.billingAddress,
-    orderLines: unvalidatedOrder.orderLines.map((line, index) => ({
-      id: `${orderId}-line-${index}`,
-      productCode: line.productCode,
-      quantity: line.quantity,
-      price: line.price,
-    })),
+    const orderLines = yield* pipe(
+      uo.orderLines,
+      Array.map(toValidatedOrderLine),
+      Effect.all,
+      Effect.flatMap(Schema.decodeUnknown(Schema.NonEmptyArray(OrderLine))),
+    );
+
+    return ValidatedOrder.make({
+      type: 'ValidatedOrder',
+      id,
+      customerInfo,
+      shippingAddress,
+      billingAddress,
+      orderLines,
+    });
   });
 };
+
+function toCheckedAddress(address: UnvalidatedAddress) {
+  return Effect.gen(function* () {
+    const checkedAddress = yield* CheckAddressExists.check(address);
+    // TODO: error handling
+    return checkedAddress;
+  });
+}
+
+/** deps2: CheckAddressExists */
+class CheckAddressExists extends Effect.Service<CheckAddressExists>()(
+  'CheckAddressExists',
+  {
+    effect: Effect.gen(function* () {
+      // dummy
+      const check = (
+        address: UnvalidatedAddress,
+      ): Effect.Effect<CheckedAddress, ParseResult.ParseError> =>
+        Effect.succeed(CheckedAddress.make(address));
+
+      return { check };
+    }),
+    accessors: true,
+  },
+) {}
+
+type CheckedAddress = typeof CheckedAddress.Type;
+const CheckedAddress = UnvalidatedAddress.pipe(Schema.brand('CheckedAddress'));
