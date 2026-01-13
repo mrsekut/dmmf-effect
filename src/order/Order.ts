@@ -1,15 +1,8 @@
-import { Schema, Array } from 'effect';
+import { Schema } from 'effect';
 
-import { ProductCode } from './ProductCode';
-import { OrderQuantity } from './OrderQuantity';
 import { CustomerInfo, type UnvalidatedCustomerInfo } from './Customer';
 import { UnvalidatedAddress, Address } from './Address';
-import {
-  type UnvalidatedOrderLine,
-  OrderLine,
-  OrderLineId,
-  Price,
-} from './OrderLine';
+import { type UnvalidatedOrderLine, OrderLine } from './OrderLine';
 
 /**
  * 注文ID
@@ -81,148 +74,148 @@ export type Order = UnvalidatedOrder | ValidatedOrder;
 // Domain Logic
 // ============================================
 
-export const changeOrderLinePrice = (
-  order: PricedOrder,
-  lineId: OrderLineId,
-  newPrice: Price,
-) => {
-  const updateLine = (line: OrderLine) =>
-    line.id === lineId ? { ...line, price: newPrice } : line;
+// export const changeOrderLinePrice = (
+//   order: PricedOrder,
+//   lineId: OrderLineId,
+//   newPrice: Price,
+// ) => {
+//   const updateLine = (line: OrderLine) =>
+//     line.id === lineId ? { ...line, price: newPrice } : line;
 
-  const updatedOrder = {
-    ...order,
-    orderLines: Array.map(order.orderLines, updateLine),
-  };
+//   const updatedOrder = {
+//     ...order,
+//     orderLines: Array.map(order.orderLines, updateLine),
+//   };
 
-  return PricedOrder.make({
-    ...updatedOrder,
-    amountToBill: calculateTotal(updatedOrder),
-  });
-};
+//   return PricedOrder.make({
+//     ...updatedOrder,
+//     amountToBill: calculateTotal(updatedOrder),
+//   });
+// };
 
-/**
- * 注文の合計金額を計算
- */
-const calculateTotal = (order: PricedOrder) => {
-  const total = order.orderLines.reduce(
-    (sum, line) => sum + line.price * line.quantity,
-    0,
-  );
-  return BillingAmount.make(total);
-};
+// /**
+//  * 注文の合計金額を計算
+//  */
+// const calculateTotal = (order: PricedOrder) => {
+//   const total = order.orderLines.reduce(
+//     (sum, line) => sum + line.price * line.quantity,
+//     0,
+//   );
+//   return BillingAmount.make(total);
+// };
 
-if (import.meta.vitest) {
-  const { describe, test, expect } = import.meta.vitest;
+// if (import.meta.vitest) {
+//   const { describe, test, expect } = import.meta.vitest;
 
-  const createOrderLine = (
-    id: string,
-    productCode: string,
-    quantity: number,
-    price: number,
-  ) =>
-    OrderLine.make({
-      id: OrderLineId.make(id),
-      productCode: Schema.decodeSync(ProductCode)(productCode),
-      quantity: Schema.decodeSync(OrderQuantity)(quantity),
-      price: Price.make(price),
-    });
+//   const createOrderLine = (
+//     id: string,
+//     productCode: string,
+//     quantity: number,
+//     price: number,
+//   ) =>
+//     OrderLine.make({
+//       id: OrderLineId.make(id),
+//       productCode: Schema.decodeSync(ProductCode)(productCode),
+//       quantity: Schema.decodeSync(OrderQuantity)(quantity),
+//       price: Price.make(price),
+//     });
 
-  const createAddress = () =>
-    Address.make({
-      street: 'Test Street',
-      city: 'Test City',
-      zipCode: '123-4567',
-    });
+//   const createAddress = () =>
+//     Address.make({
+//       street: 'Test Street',
+//       city: 'Test City',
+//       zipCode: '123-4567',
+//     });
 
-  const createBillingAddress = () =>
-    Address.make({
-      street: 'Test Street',
-      city: 'Test City',
-      zipCode: '123-4567',
-    });
+//   const createBillingAddress = () =>
+//     Address.make({
+//       street: 'Test Street',
+//       city: 'Test City',
+//       zipCode: '123-4567',
+//     });
 
-  const createCustomerInfo = () =>
-    Schema.decodeSync(CustomerInfo)({
-      name: {
-        firstName: 'Test',
-        lastName: 'Customer',
-      },
-      emailAddress: 'test@example.com',
-    });
+//   const createCustomerInfo = () =>
+//     Schema.decodeSync(CustomerInfo)({
+//       name: {
+//         firstName: 'Test',
+//         lastName: 'Customer',
+//       },
+//       emailAddress: 'test@example.com',
+//     });
 
-  const createValidatedOrder = (
-    orderLines: Array.NonEmptyArray<OrderLine>,
-    amountToBill = 0,
-  ) =>
-    PricedOrder.make({
-      type: 'PricedOrder',
-      id: OrderId.make('order-1'),
-      customerInfo: createCustomerInfo(),
-      shippingAddress: createAddress(),
-      billingAddress: createBillingAddress(),
-      orderLines,
-      amountToBill: BillingAmount.make(amountToBill),
-    });
+//   const createValidatedOrder = (
+//     orderLines: Array.NonEmptyArray<OrderLine>,
+//     amountToBill = 0,
+//   ) =>
+//     PricedOrder.make({
+//       type: 'PricedOrder',
+//       id: OrderId.make('order-1'),
+//       customerInfo: createCustomerInfo(),
+//       shippingAddress: createAddress(),
+//       billingAddress: createBillingAddress(),
+//       orderLines,
+//       amountToBill: BillingAmount.make(amountToBill),
+//     });
 
-  describe('changeOrderLinePrice', () => {
-    test('指定したOrderLineのpriceを更新する', () => {
-      const line1 = createOrderLine('line-1', 'W1234', 2, 100);
-      const line2 = createOrderLine('line-2', 'G123', 3, 200);
-      const order = createValidatedOrder([line1, line2], 800);
+//   describe('changeOrderLinePrice', () => {
+//     test('指定したOrderLineのpriceを更新する', () => {
+//       const line1 = createOrderLine('line-1', 'W1234', 2, 100);
+//       const line2 = createOrderLine('line-2', 'G123', 3, 200);
+//       const order = createValidatedOrder([line1, line2], 800);
 
-      const result = changeOrderLinePrice(
-        order,
-        OrderLineId.make('line-1'),
-        Price.make(150),
-      );
+//       const result = changeOrderLinePrice(
+//         order,
+//         OrderLineId.make('line-1'),
+//         Price.make(150),
+//       );
 
-      const updatedLine = result.orderLines.find(
-        l => l.id === OrderLineId.make('line-1'),
-      );
-      expect(updatedLine?.price).toBe(150);
-    });
+//       const updatedLine = result.orderLines.find(
+//         l => l.id === OrderLineId.make('line-1'),
+//       );
+//       expect(updatedLine?.price).toBe(150);
+//     });
 
-    test('amountToBillを再計算して更新する', () => {
-      const line1 = createOrderLine('line-1', 'W1234', 2, 100);
-      const line2 = createOrderLine('line-2', 'G123', 3, 200);
-      // 初期: 2*100 + 3*200 = 800
-      const order = createValidatedOrder([line1, line2], 800);
+//     test('amountToBillを再計算して更新する', () => {
+//       const line1 = createOrderLine('line-1', 'W1234', 2, 100);
+//       const line2 = createOrderLine('line-2', 'G123', 3, 200);
+//       // 初期: 2*100 + 3*200 = 800
+//       const order = createValidatedOrder([line1, line2], 800);
 
-      const result = changeOrderLinePrice(
-        order,
-        OrderLineId.make('line-1'),
-        Price.make(150),
-      );
+//       const result = changeOrderLinePrice(
+//         order,
+//         OrderLineId.make('line-1'),
+//         Price.make(150),
+//       );
 
-      // 更新後: 2*150 + 3*200 = 900
-      expect(result.amountToBill).toBe(900);
-    });
+//       // 更新後: 2*150 + 3*200 = 900
+//       expect(result.amountToBill).toBe(900);
+//     });
 
-    test('存在しないlineIdの場合はorderを変更しない', () => {
-      const line1 = createOrderLine('line-1', 'W1234', 2, 100);
-      const order = createValidatedOrder([line1], 200);
+//     test('存在しないlineIdの場合はorderを変更しない', () => {
+//       const line1 = createOrderLine('line-1', 'W1234', 2, 100);
+//       const order = createValidatedOrder([line1], 200);
 
-      const result = changeOrderLinePrice(
-        order,
-        OrderLineId.make('non-existent'),
-        Price.make(999),
-      );
+//       const result = changeOrderLinePrice(
+//         order,
+//         OrderLineId.make('non-existent'),
+//         Price.make(999),
+//       );
 
-      expect(result.orderLines[0].price).toBe(100);
-      expect(result.amountToBill).toBe(200);
-    });
-  });
+//       expect(result.orderLines[0].price).toBe(100);
+//       expect(result.amountToBill).toBe(200);
+//     });
+//   });
 
-  describe('calculateTotal', () => {
-    test('orderLinesの合計金額を計算する', () => {
-      const line1 = createOrderLine('line-1', 'W1234', 2, 100);
-      const line2 = createOrderLine('line-2', 'G123', 3, 200);
-      const order = createValidatedOrder([line1, line2], 0);
+//   describe('calculateTotal', () => {
+//     test('orderLinesの合計金額を計算する', () => {
+//       const line1 = createOrderLine('line-1', 'W1234', 2, 100);
+//       const line2 = createOrderLine('line-2', 'G123', 3, 200);
+//       const order = createValidatedOrder([line1, line2], 0);
 
-      const result = calculateTotal(order);
+//       const result = calculateTotal(order);
 
-      // 2*100 + 3*200 = 800
-      expect(result).toBe(800);
-    });
-  });
-}
+//       // 2*100 + 3*200 = 800
+//       expect(result).toBe(800);
+//     });
+//   });
+// }

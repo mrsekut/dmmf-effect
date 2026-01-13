@@ -49,14 +49,14 @@ it.effect(
           },
           orderLines: [
             {
+              id: 'line-1',
               productCode: 'W1234',
               quantity: 2,
-              price: 3000,
             },
             {
+              id: 'line-2',
               productCode: 'G123',
               quantity: 1,
-              price: 4500,
             },
           ],
         }),
@@ -103,9 +103,9 @@ it.effect('複数の注文を順次処理できる', () =>
         },
         orderLines: [
           {
+            id: 'line-1',
             productCode: 'W1234',
             quantity: 2,
-            price: 3000,
           },
         ],
       }),
@@ -133,9 +133,9 @@ it.effect('複数の注文を順次処理できる', () =>
         },
         orderLines: [
           {
+            id: 'line-1',
             productCode: 'G456',
             quantity: 1,
-            price: 5000,
           },
         ],
       }),
