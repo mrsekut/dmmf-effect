@@ -29,6 +29,7 @@ export const ProductCode = Schema.Union(WidgetCode, GizmoCode);
 export function toProductCode(productCode: string) {
   const checkProduct = (productCode: ProductCode) =>
     Effect.gen(function* () {
+      // predicateToPassthruを定義しても良い
       const exists = yield* CheckProductCodeExists.check(productCode);
       if (exists) {
         return productCode;
