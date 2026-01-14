@@ -1,6 +1,6 @@
 import { Effect, Schema } from 'effect';
-import type { ProductCode } from './ProductCode';
-import { Price } from './OrderLine';
+import type { ProductCode } from '../../ProductCode';
+import { Price } from '../../OrderLine';
 
 /**
  *  ローカルで実行されるが、失敗の可能性はある

@@ -1,5 +1,5 @@
 import { Effect } from 'effect';
-import type { ProductCode } from './ProductCode';
+import type { ProductCode } from '../../ProductCode';
 
 /**
  * deps1: CheckProductCodeExists

@@ -1,7 +1,7 @@
 import { Effect, Schema } from 'effect';
 import { mkOrderQuantity, OrderQuantity } from './OrderQuantity';
 import { ProductCode, toProductCode } from './ProductCode';
-import { GetProductPrice } from './GetProductPrice';
+import { GetProductPrice } from './workflows/placeOrder/GetProductPrice';
 
 /**
  * Price（価格）

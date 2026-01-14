@@ -16,8 +16,8 @@ import {
 } from './acknowledgeOrder';
 import { priceOrder } from './priceOrder';
 import { createOrderPlacedEvent } from './createOrderPlacedEvent';
-import { CheckProductCodeExists } from '../../CheckProductCodeExists';
-import { GetProductPrice } from '../../GetProductPrice';
+import { CheckProductCodeExists } from './CheckProductCodeExists';
+import { GetProductPrice } from './GetProductPrice';
 
 /**
  * PlaceOrder Workflow

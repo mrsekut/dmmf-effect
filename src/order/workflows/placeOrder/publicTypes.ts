@@ -7,7 +7,7 @@ import type { ParseError } from 'effect/ParseResult';
 import type { PricedOrder, OrderId, BillingAmount } from '../../Order';
 import type { Address } from '../../Address';
 import type { EmailAddress } from '../../CustomerEmail';
-import type { PricingError } from '../../GetProductPrice';
+import type { PricingError } from './GetProductPrice';
 
 // ------------------------------------
 // outputs from the workflow (success case)

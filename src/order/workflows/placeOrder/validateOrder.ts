@@ -3,7 +3,7 @@ import { OrderId, ValidatedOrder, type UnvalidatedOrder } from '../../Order';
 import { toAddress, UnvalidatedAddress } from '../../Address';
 import { toCustomerInfo } from '../../Customer';
 import { OrderLine, toValidatedOrderLine } from '../../OrderLine';
-import type { CheckProductCodeExists } from '../../CheckProductCodeExists';
+import type { CheckProductCodeExists } from './CheckProductCodeExists';
 
 /**
  * ValidateOrder
