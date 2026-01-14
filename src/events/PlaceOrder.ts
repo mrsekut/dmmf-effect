@@ -1,5 +1,5 @@
-import type { BillingAmount, OrderId, PricedOrder } from '../order';
-import type { Address } from '../order/Address';
+import type { PricedOrder } from '../order';
+import type { BillableOrderPlacedEvent } from '../order/workflows/placeOrder';
 import type { OrderAcknowledgmentSentEvent } from '../order/workflows/placeOrder/acknowledgeOrder';
 
 /**
@@ -12,22 +12,12 @@ export type OrderPlacedEvent = {
 } & Omit<PricedOrder, 'type'>;
 
 /**
- * BillableOrderPlaced（請求可能な注文確定）イベント
- */
-type BillableOrderPlacedEvent = {
-  type: 'BillableOrderPlaced';
-  orderId: OrderId;
-  billingAddress: Address;
-  amountToBill: BillingAmount;
-};
-
-/**
  * PlaceOrderEvent（注文確定イベント）
  */
 export type PlaceOrderEvent =
-  | OrderAcknowledgmentSentEvent
   | OrderPlacedEvent
-  | BillableOrderPlacedEvent;
+  | BillableOrderPlacedEvent
+  | OrderAcknowledgmentSentEvent;
 
 /**
  * ValidationError（検証エラー）

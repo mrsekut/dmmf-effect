@@ -15,7 +15,9 @@ export const startShippingEventListener = Effect.gen(function* () {
   yield* Effect.forever(
     Effect.gen(function* () {
       const event = yield* Queue.take(orderQueue);
-      yield* handleOrderPlacedEvent(event);
+      if (event.type === 'OrderPlaced') {
+        yield* handleOrderPlacedEvent(event);
+      }
     }),
   );
 });
@@ -50,7 +52,7 @@ const fromOrderPlacedEvent = (event: OrderPlacedEvent): ShipOrderDTO => ({
   },
   shippingAddress: event.shippingAddress,
   items: event.orderLines.map(line => ({
-    productId: line.productCode,
+    productId: line.productCode.code,
     quantity: line.quantity,
   })),
 });

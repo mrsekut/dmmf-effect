@@ -1,5 +1,5 @@
 import { Effect, Layer, Queue } from 'effect';
-import type { OrderPlacedEvent, OrderShippedEvent } from './events';
+import type { OrderShippedEvent, PlaceOrderEvent } from './events';
 
 const QUEUE_CAPACITY = 100;
 
@@ -9,7 +9,7 @@ const QUEUE_CAPACITY = 100;
 export class OrderEventQueue extends Effect.Service<OrderEventQueue>()(
   'app/OrderEventQueue',
   {
-    effect: Queue.bounded<OrderPlacedEvent>(QUEUE_CAPACITY),
+    effect: Queue.bounded<PlaceOrderEvent>(QUEUE_CAPACITY),
   },
 ) {}
 
