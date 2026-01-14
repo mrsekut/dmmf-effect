@@ -40,7 +40,7 @@ export const acknowledgeOrder: AcknowledgeOrder = po => {
  * deps1: CreateOrderAcknowledgementLetter
  * - ローカルで実行され、失敗の可能性もない
  */
-class CreateOrderAcknowledgementLetter extends Effect.Service<CreateOrderAcknowledgementLetter>()(
+export class CreateOrderAcknowledgementLetter extends Effect.Service<CreateOrderAcknowledgementLetter>()(
   'CreateOrderAcknowledgementLetter',
   {
     effect: Effect.gen(function* () {
@@ -60,7 +60,7 @@ const HtmlString = Schema.String.pipe(Schema.brand('HtmlString'));
  * deps2: SendOrderAcknowledgement
  * - I/O処理があり、失敗の可能性があるが、エラーの詳細は気にしないのでResultは不要
  */
-class SendOrderAcknowledgement extends Effect.Service<SendOrderAcknowledgement>()(
+export class SendOrderAcknowledgement extends Effect.Service<SendOrderAcknowledgement>()(
   'SendOrderAcknowledgement',
   {
     effect: Effect.gen(function* () {

@@ -59,7 +59,7 @@ function toCheckedAddress(address: UnvalidatedAddress) {
 }
 
 /** deps2: CheckAddressExists */
-class CheckAddressExists extends Effect.Service<CheckAddressExists>()(
+export class CheckAddressExists extends Effect.Service<CheckAddressExists>()(
   'CheckAddressExists',
   {
     effect: Effect.gen(function* () {

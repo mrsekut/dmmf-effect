@@ -1,27 +1,25 @@
-import { Effect, Queue } from 'effect';
-import type { ParseError } from 'effect/ParseResult';
+import { Array, Effect, Layer, Option, pipe, Queue } from 'effect';
 import { OrderEventQueue } from '../../../queues';
-import { validateOrder } from './validateOrder';
-import type { UnvalidatedOrder, ValidatedOrder } from '../../Order';
-import type { PlaceOrderCommand } from './command';
+import { CheckAddressExists, validateOrder } from './validateOrder';
 import type {
-  OrderPlacedEvent,
-  PlaceOrderError,
-  PlaceOrderEvent,
-} from '../../../events';
-
-/**
- * PlaceOrder ワークフロー
- * - 「注文確定」プロセス
- */
-export type PlaceOrder = (
-  uo: UnvalidatedOrder,
-) => Effect.Effect<PlaceOrderEvent, PlaceOrderError>;
-
-type PlaceOrderResult = {
-  readonly order: ValidatedOrder;
-  readonly events: readonly OrderPlacedEvent[];
-};
+  BillingAmount,
+  OrderId,
+  PricedOrder,
+  UnvalidatedOrder,
+} from '../../Order';
+import type { PlaceOrderCommand } from './command';
+import { PlaceOrderError, type PlaceOrderEvent } from '../../../events';
+import {
+  acknowledgeOrder,
+  CreateOrderAcknowledgementLetter,
+  SendOrderAcknowledgement,
+  type OrderAcknowledgmentSentEvent,
+} from './acknowledgeOrder';
+import { priceOrder } from './priceOrder';
+import type { Address } from '../../Address';
+import { createOrderPlacedEvent } from './createOrderPlacedEvent';
+import { CheckProductCodeExists } from '../../CheckProductCodeExists';
+import { GetProductPrice } from '../../GetProductPrice';
 
 /**
  * PlaceOrder Workflow
@@ -34,42 +32,88 @@ type PlaceOrderResult = {
  *  3. ワークフロー実行: ビジネスロジック（Validate → Price → Acknowledge）
  *  4. 出力: イベントを生成してキューに送信
  */
-export const placeOrderWorkflow = (
-  command: PlaceOrderCommand,
-): Effect.Effect<PlaceOrderResult, ParseError, OrderEventQueue> =>
+export const placeOrderWorkflow = (command: PlaceOrderCommand) =>
+  // ): Effect.Effect<PlaceOrderResult, ParseError, OrderEventQueue> =>
   Effect.gen(function* () {
     // コマンドからUnvalidatedOrderを取り出す
     const unvalidatedOrder = command.data;
 
-    // Step 1: バリデーション（UnvalidatedOrder → ValidatedOrder）
-    const validatedOrder = yield* validateOrder(unvalidatedOrder);
-
-    // Step 2: ワークフロー実行（将来的に Price → Acknowledge を追加）
-    const result = yield* placeOrderCore(validatedOrder);
+    const events = yield* placeOrder(unvalidatedOrder).pipe(
+      Effect.provide(PlaceOrderLive),
+    );
 
     // イベントをキューに送信
     const queue = yield* OrderEventQueue;
-    yield* Effect.all(result.events.map(e => Queue.offer(queue, e)));
+    yield* Effect.all(events.map(e => Queue.offer(queue, e)));
 
     yield* Effect.log(
-      `Order placed: ${result.order.id} by user: ${command.userId}`,
+      `Order placed: ${unvalidatedOrder.orderId} by user: ${command.userId}`,
     );
 
-    return result;
+    return events;
   });
+
+const PlaceOrderLive = Layer.mergeAll(
+  CheckAddressExists.Default,
+  CheckProductCodeExists.Default,
+  GetProductPrice.Default,
+  CreateOrderAcknowledgementLetter.Default,
+  SendOrderAcknowledgement.Default,
+);
 
 /**
- * PlaceOrder Core Workflow
- * - パイプラインの各ステップはステートレスで副作用がないように設計
- * - 各ステップは独立してテストし、理解できる
+ * PlaceOrder ワークフロー
+ * - 「注文確定」プロセス
  */
-const placeOrderCore = (order: ValidatedOrder) =>
-  Effect.gen(function* () {
-    // Step 3: イベント生成
-    // const orderPlacedEvent = createOrderPlacedEvent(order);
+const placeOrder = (unvalidatedOrder: UnvalidatedOrder) => {
+  return Effect.gen(function* () {
+    const validatedOrder = yield* pipe(
+      validateOrder(unvalidatedOrder),
+      Effect.mapError(error => PlaceOrderError.Validation({ error })),
+    );
+    const pricedOrder = yield* pipe(
+      priceOrder(validatedOrder),
+      Effect.mapError(error => PlaceOrderError.Pricing({ error })),
+    );
+    const acknowledgementOption = yield* acknowledgeOrder(pricedOrder);
 
-    return {
-      order,
-      events: [],
-    } as const satisfies PlaceOrderResult;
+    return createEvents(pricedOrder, acknowledgementOption);
   });
+};
+
+type CreateEvents = (
+  po: PricedOrder,
+  e: Option.Option<OrderAcknowledgmentSentEvent>,
+) => PlaceOrderEvent[];
+
+const createEvents: CreateEvents = (po, acknowledgmentEventOpt) => {
+  const acknowledgmentEvents = pipe(acknowledgmentEventOpt, Option.toArray);
+  const orderPlacedEvents = pipe(po, createOrderPlacedEvent, Array.make);
+  const billingEvents = pipe(po, createBillingEvent, Option.toArray);
+
+  return [...acknowledgmentEvents, ...orderPlacedEvents, ...billingEvents];
+};
+
+function createBillingEvent(
+  po: PricedOrder,
+): Option.Option<BillableOrderPlacedEvent> {
+  if (po.amountToBill === 0) {
+    return Option.none();
+  }
+  return Option.some({
+    type: 'BillableOrderPlaced',
+    orderId: po.id,
+    billingAddress: po.billingAddress,
+    amountToBill: po.amountToBill,
+  });
+}
+
+/**
+ * BillableOrderPlaced（請求可能な注文確定）イベント
+ */
+export type BillableOrderPlacedEvent = {
+  type: 'BillableOrderPlaced';
+  orderId: OrderId;
+  billingAddress: Address;
+  amountToBill: BillingAmount;
+};

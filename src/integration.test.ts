@@ -71,9 +71,11 @@ it.effect(
 
       yield* Fiber.interrupt(shippingFiber);
 
-      expect(orderResult.order.id).toBeDefined();
+      // placeOrderWorkflow は PlaceOrderEvent[] を返す
+      const orderPlacedEvent = orderResult.find(e => e.type === 'OrderPlaced');
+      expect(orderPlacedEvent).toBeDefined();
       expect(events).toHaveLength(1);
-      expect(events[0]!.orderId).toBe(orderResult.order.id);
+      expect(events[0]!.orderId).toBe(orderPlacedEvent!.id);
       expect(events[0]!.trackingNumber).toBeDefined();
     }).pipe(Effect.provide(QueuesLive), Effect.provide(Logger.pretty)),
 );
@@ -152,9 +154,13 @@ it.effect('複数の注文を順次処理できる', () =>
 
     expect(events).toHaveLength(2);
 
+    // placeOrderWorkflow は PlaceOrderEvent[] を返す
+    const order1PlacedEvent = order1Result.find(e => e.type === 'OrderPlaced');
+    const order2PlacedEvent = order2Result.find(e => e.type === 'OrderPlaced');
+
     const orderIds = events.map(e => e.orderId);
-    expect(orderIds).toContain(order1Result.order.id);
-    expect(orderIds).toContain(order2Result.order.id);
+    expect(orderIds).toContain(order1PlacedEvent!.id);
+    expect(orderIds).toContain(order2PlacedEvent!.id);
 
     events.forEach(e => expect(e.trackingNumber).toBeDefined());
   }).pipe(Effect.provide(QueuesLive), Effect.provide(Logger.pretty)),

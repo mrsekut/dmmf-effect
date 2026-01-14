@@ -1,4 +1,7 @@
+import { Data } from 'effect';
+import type { ParseError } from 'effect/ParseResult';
 import type { PricedOrder } from '../order';
+import type { PricingError } from '../order/GetProductPrice';
 import type { BillableOrderPlacedEvent } from '../order/workflows/placeOrder';
 import type { OrderAcknowledgmentSentEvent } from '../order/workflows/placeOrder/acknowledgeOrder';
 
@@ -20,17 +23,11 @@ export type PlaceOrderEvent =
   | OrderAcknowledgmentSentEvent;
 
 /**
- * ValidationError（検証エラー）
- * - エラーの説明とどのフィールドに適用されるかを含む
- */
-type ValidationError = {
-  type: 'ValidationError';
-  fieldName: string;
-  errorDescription: string;
-};
-
-/**
  * PlaceOrderError（注文確定エラー）
  * - ワークフローが失敗したときのエラー型
  */
-export type PlaceOrderError = ValidationError[]; // | TODO:;
+export type PlaceOrderError = Data.TaggedEnum<{
+  Validation: { error: ParseError };
+  Pricing: { error: PricingError };
+}>;
+export const PlaceOrderError = Data.taggedEnum<PlaceOrderError>();
