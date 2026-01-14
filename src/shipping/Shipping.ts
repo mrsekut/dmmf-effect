@@ -1,5 +1,4 @@
 import { Schema } from 'effect';
-import { CustomerInfo } from '../order';
 
 /**
  * 発送ID
@@ -26,8 +25,7 @@ export const TrackingNumber = Schema.String.pipe(
 
 /**
  * 発送先住所
- * - 発送コンテキストでの表現
- * - (注文と発送は Shared Kernel の関係である)
+ * - 発送コンテキスト独自の型
  */
 export type ShippingAddress = typeof ShippingAddress.Type;
 export const ShippingAddress = Schema.Struct({
@@ -35,6 +33,19 @@ export const ShippingAddress = Schema.Struct({
   city: Schema.String.pipe(Schema.minLength(1)),
   zipCode: Schema.String.pipe(Schema.pattern(/^\d{3}-?\d{4}$/)),
 }).pipe(Schema.brand('ShippingAddress'));
+
+/**
+ * 顧客情報
+ * - 発送コンテキスト独自の型（受注コンテキストの型に依存しない）
+ */
+export type CustomerInfo = typeof CustomerInfo.Type;
+export const CustomerInfo = Schema.Struct({
+  name: Schema.Struct({
+    firstName: Schema.String.pipe(Schema.minLength(1)),
+    lastName: Schema.String.pipe(Schema.minLength(1)),
+  }),
+  emailAddress: Schema.String.pipe(Schema.pattern(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)),
+}).pipe(Schema.brand('ShippingCustomerInfo'));
 
 /**
  * 発送品目
