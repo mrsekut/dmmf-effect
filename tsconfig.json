@@ -8,6 +8,11 @@
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "allowJs": true,
+    "plugins": [
+      {
+        "name": "@effect/language-service"
+      }
+    ],
 
     // Bundler mode
     "moduleResolution": "bundler",
