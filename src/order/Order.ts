@@ -1,4 +1,4 @@
-import { Array, Effect, Schema } from 'effect';
+import { Array, Schema } from 'effect';
 
 import { CustomerInfo, type UnvalidatedCustomerInfo } from './Customer';
 import { UnvalidatedAddress, Address } from './Address';
@@ -10,7 +10,7 @@ import {
   PricedOrderLine,
 } from './OrderLine';
 import { ProductCodeFromString } from './ProductCode';
-import { mkOrderQuantity, OrderQuantity } from './OrderQuantity';
+import { mkOrderQuantity } from './OrderQuantity';
 
 /**
  * 注文ID
