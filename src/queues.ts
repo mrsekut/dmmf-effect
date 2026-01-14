@@ -1,5 +1,6 @@
 import { Effect, Layer, Queue } from 'effect';
-import type { OrderShippedEvent, PlaceOrderEvent } from './events';
+import type { OrderShippedEvent } from './shipping/publicTypes';
+import { PlaceOrderEvent } from './order';
 
 const QUEUE_CAPACITY = 100;
 

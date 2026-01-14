@@ -1,22 +1,20 @@
 import { Array, Effect, Layer, Option, pipe, Queue } from 'effect';
 import { OrderEventQueue } from '../../../queues';
 import { CheckAddressExists, validateOrder } from './validateOrder';
-import type {
-  BillingAmount,
-  OrderId,
-  PricedOrder,
-  UnvalidatedOrder,
-} from '../../Order';
+import type { PricedOrder, UnvalidatedOrder } from '../../Order';
 import type { PlaceOrderCommand } from './command';
-import { PlaceOrderError, type PlaceOrderEvent } from '../../../events';
+import {
+  PlaceOrderError,
+  type PlaceOrderEvent,
+  type BillableOrderPlacedEvent,
+  type OrderAcknowledgmentSentEvent,
+} from './publicTypes';
 import {
   acknowledgeOrder,
   CreateOrderAcknowledgementLetter,
   SendOrderAcknowledgement,
-  type OrderAcknowledgmentSentEvent,
 } from './acknowledgeOrder';
 import { priceOrder } from './priceOrder';
-import type { Address } from '../../Address';
 import { createOrderPlacedEvent } from './createOrderPlacedEvent';
 import { CheckProductCodeExists } from '../../CheckProductCodeExists';
 import { GetProductPrice } from '../../GetProductPrice';
@@ -107,13 +105,3 @@ function createBillingEvent(
     amountToBill: po.amountToBill,
   });
 }
-
-/**
- * BillableOrderPlaced（請求可能な注文確定）イベント
- */
-export type BillableOrderPlacedEvent = {
-  type: 'BillableOrderPlaced';
-  orderId: OrderId;
-  billingAddress: Address;
-  amountToBill: BillingAmount;
-};

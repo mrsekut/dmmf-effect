@@ -1,4 +1,4 @@
-import type { OrderPlacedEvent } from '../../events';
+import type { OrderPlacedEvent } from '../../order';
 import { OrderEventQueue } from '../../queues';
 import type { ShipOrderDTO } from '../fromDTO';
 import { shipOrderWorkflow } from './workflow';

@@ -1,8 +1,8 @@
 import { Effect, Queue } from 'effect';
 import type { Shipment } from '../Shipping';
 import { markAsShipped } from '../Shipping';
+import type { OrderShippedEvent } from '../publicTypes';
 import { ShippingEventQueue } from '../../queues';
-import type { OrderShippedEvent } from '../../events';
 import type { ParseError } from 'effect/ParseResult';
 import { toOrderShippedEvent } from '../toDTO';
 import { type ShipOrderDTO } from '../fromDTO';

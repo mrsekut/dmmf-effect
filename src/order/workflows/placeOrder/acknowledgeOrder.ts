@@ -1,6 +1,7 @@
 import { Option, Effect, Schema, Match, Data, pipe } from 'effect';
-import { PricedOrder, OrderId } from '../../Order';
+import { PricedOrder } from '../../Order';
 import type { EmailAddress } from '../../CustomerEmail';
+import type { OrderAcknowledgmentSentEvent } from './publicTypes';
 
 type AcknowledgeOrder = (
   o: PricedOrder,
@@ -84,12 +85,3 @@ type SendResult = Data.TaggedEnum<{
   NotSent: {};
 }>;
 const SendResult = Data.taggedEnum<SendResult>();
-
-/**
- * AcknowledgmentSent（確認送信済み）イベント
- */
-export type OrderAcknowledgmentSentEvent = {
-  type: 'AcknowledgmentSent';
-  orderId: OrderId;
-  emailAddress: EmailAddress;
-};

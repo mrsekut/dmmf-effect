@@ -1,5 +1,5 @@
-import type { OrderShippedEvent } from '../events';
 import type { Shipment } from './Shipping';
+import type { OrderShippedEvent } from './publicTypes';
 
 /**
  * Domain Object → Event DTO

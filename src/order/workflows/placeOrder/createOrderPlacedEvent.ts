@@ -1,4 +1,4 @@
-import type { OrderPlacedEvent } from '../../../events';
+import type { OrderPlacedEvent } from './publicTypes';
 import type { PricedOrder } from '../../Order';
 
 /**
