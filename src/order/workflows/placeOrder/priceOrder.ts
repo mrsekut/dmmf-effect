@@ -1,25 +1,34 @@
-import { Context, Effect, Schema } from 'effect';
-import { ValidatedOrder, PricedOrder } from '../../Order';
-import type { ProductCode } from '../../ProductCode';
-import type { Price } from '../../OrderLine';
+import { Array, Effect, pipe } from 'effect';
+import { ValidatedOrder, PricedOrder, BillingAmount } from '../../Order';
+import type { GetProductPrice, PricingError } from '../../GetProductPrice';
+import { toPricedOrderLine } from '../../OrderLine';
 
-/**
- * deps1: GetProductPrice
- *  ローカルで実行されるが、失敗の可能性はある
- */
-class GetProductPrice extends Context.Tag('GetProductPrice')<
-  GetProductPrice,
-  {
-    readonly getProductPrice: (
-      c: ProductCode,
-    ) => Effect.Effect<Price, PricingError>;
-  }
->() {}
-
-class PricingError extends Schema.TaggedError<PricingError>()('PricingError', {
-  message: Schema.String,
-}) {}
-
-export type PriceOrder = <E>(
+type PriceOrder = (
   o: ValidatedOrder,
-) => Effect.Effect<PricedOrder, E | PricingError, GetProductPrice>;
+) => Effect.Effect<PricedOrder, PricingError, GetProductPrice>;
+
+export const priceOrder: PriceOrder = vo => {
+  return Effect.gen(function* () {
+    const orderLines = yield* pipe(
+      vo.orderLines,
+      Array.map(toPricedOrderLine),
+      Effect.all,
+    );
+
+    const amountToBill = pipe(
+      orderLines,
+      Array.reduce(0, (acc, line) => acc + line.price),
+      BillingAmount.make,
+    );
+
+    return PricedOrder.make({
+      type: 'PricedOrder',
+      id: vo.id,
+      customerInfo: vo.customerInfo,
+      shippingAddress: vo.shippingAddress,
+      billingAddress: vo.billingAddress,
+      orderLines,
+      amountToBill,
+    });
+  });
+};
