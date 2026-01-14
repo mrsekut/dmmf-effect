@@ -1,6 +1,6 @@
 import { Effect, pipe, Schema } from 'effect';
 import { CheckProductCodeExists } from './CheckProductCodeExists';
-import { parseError } from 'effect/ParseResult';
+import { parseError, Type } from 'effect/ParseResult';
 
 /**
  * WidgetCode（装置コード）
@@ -26,10 +26,32 @@ const GizmoCode = Schema.TaggedStruct('Gizmo', {
 export type ProductCode = typeof ProductCode.Type;
 export const ProductCode = Schema.Union(WidgetCode, GizmoCode);
 
+/**
+ * 文字列からProductCodeへの変換スキーマ
+ */
+export const ProductCodeFromString = Schema.transformOrFail(
+  Schema.String,
+  ProductCode,
+  {
+    strict: true,
+    decode: (code, _, ast) => {
+      if (/^W\d{4}$/.test(code)) {
+        return Effect.succeed(WidgetCode.make({ code }));
+      }
+      if (/^G\d{3}$/.test(code)) {
+        return Effect.succeed(GizmoCode.make({ code }));
+      }
+      return Effect.fail(
+        new Type(ast, code, `Invalid product code format: ${code}`),
+      );
+    },
+    encode: productCode => Effect.succeed(productCode.code),
+  },
+);
+
 export function toProductCode(productCode: string) {
   const checkProduct = (productCode: ProductCode) =>
     Effect.gen(function* () {
-      // predicateToPassthruを定義しても良い
       const exists = yield* CheckProductCodeExists.check(productCode);
       if (exists) {
         return productCode;
@@ -47,7 +69,7 @@ export function toProductCode(productCode: string) {
 
   return pipe(
     productCode,
-    Schema.decodeUnknown(ProductCode),
+    Schema.decodeUnknown(ProductCodeFromString),
     Effect.flatMap(checkProduct),
   );
 }
