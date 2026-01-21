@@ -4,6 +4,7 @@ import { toAddress, UnvalidatedAddress } from '../../Address';
 import { toCustomerInfo } from '../../Customer';
 import { OrderLine, toValidatedOrderLine } from '../../OrderLine';
 import type { CheckProductCodeExists } from './CheckProductCodeExists';
+import { RemoteServiceError } from './publicTypes';
 
 /**
  * ValidateOrder
@@ -12,7 +13,7 @@ type ValidateOrder = (
   uo: UnvalidatedOrder,
 ) => Effect.Effect<
   ValidatedOrder,
-  ParseResult.ParseError,
+  ParseResult.ParseError | RemoteServiceError,
   CheckAddressExists | CheckProductCodeExists
 >;
 
@@ -66,7 +67,7 @@ export class CheckAddressExists extends Effect.Service<CheckAddressExists>()(
       // dummy
       const check = (
         address: UnvalidatedAddress,
-      ): Effect.Effect<CheckedAddress, ParseResult.ParseError> =>
+      ): Effect.Effect<CheckedAddress, RemoteServiceError> =>
         Effect.succeed(CheckedAddress.make(address));
 
       return { check };

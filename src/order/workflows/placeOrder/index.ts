@@ -1,4 +1,4 @@
-import { Array, Effect, Layer, Option, pipe, Queue } from 'effect';
+import { Array, Effect, Layer, Match, Option, pipe, Queue } from 'effect';
 import { OrderEventQueue } from '../../../queues';
 import { CheckAddressExists, validateOrder } from './validateOrder';
 import type { PricedOrder, UnvalidatedOrder } from '../../Order';
@@ -67,7 +67,14 @@ const placeOrder = (unvalidatedOrder: UnvalidatedOrder) => {
   return Effect.gen(function* () {
     const validatedOrder = yield* pipe(
       validateOrder(unvalidatedOrder),
-      Effect.mapError(error => PlaceOrderError.Validation({ error })),
+      Effect.mapError(error =>
+        Match.value(error).pipe(
+          Match.discriminatorsExhaustive('_tag')({
+            RemoteServiceError: (error) => PlaceOrderError.RemoteService({ error }),
+            ParseError: (error) => PlaceOrderError.Validation({ error }),
+          }),
+        )
+      ),
     );
     const pricedOrder = yield* pipe(
       priceOrder(validatedOrder),

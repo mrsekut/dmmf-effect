@@ -2,7 +2,7 @@
  * PlaceOrder Workflow の公開型
  * - ワークフローの入出力として公開される型を定義
  */
-import { Data } from 'effect';
+import { Data, Schema } from 'effect';
 import type { ParseError } from 'effect/ParseResult';
 import type { PricedOrder, OrderId, BillingAmount } from '../../Order';
 import type { Address } from '../../Address';
@@ -55,11 +55,36 @@ export type OrderAcknowledgmentSentEvent = {
 // ------------------------------------
 
 /**
+ * ServiceInfo（サービス情報）
+ * - 外部サービスの識別情報
+ */
+export type ServiceInfo = {
+  name: string;
+  endpoint: string;
+};
+
+/**
+ * RemoteServiceError
+ * - 外部サービス呼び出しが失敗したときのエラー型
+ */
+export class RemoteServiceError extends Schema.TaggedError<RemoteServiceError>()(
+  'RemoteServiceError',
+  {
+    service: Schema.Struct({
+      name: Schema.String,
+      endpoint: Schema.String,
+    }),
+    message: Schema.String,
+  },
+) {}
+
+/**
  * PlaceOrderError（注文確定エラー）
  * - ワークフローが失敗したときのエラー型
  */
 export type PlaceOrderError = Data.TaggedEnum<{
   Validation: { error: ParseError };
   Pricing: { error: PricingError };
+  RemoteService: { error: RemoteServiceError };
 }>;
 export const PlaceOrderError = Data.taggedEnum<PlaceOrderError>();
