@@ -1,7 +1,7 @@
-import { Array, Effect, Layer, Option, pipe, Queue } from 'effect';
+import { Array, Effect, Either, Layer, Match, Option, pipe, Queue } from 'effect';
 import { OrderEventQueue } from '../../../queues';
 import { CheckAddressExists, validateOrder } from './validateOrder';
-import type { PricedOrder, UnvalidatedOrder } from '../../Order';
+import type { PricedOrder, UnvalidatedOrder } from '../../models/Order';
 import type { PlaceOrderCommand } from './command';
 import {
   PlaceOrderError,
@@ -18,6 +18,71 @@ import { priceOrder } from './priceOrder';
 import { createOrderPlacedEvent } from './createOrderPlacedEvent';
 import { CheckProductCodeExists } from './CheckProductCodeExists';
 import { GetProductPrice } from './GetProductPrice';
+import { fromPlaceOrderError, fromPlaceOrderEvent, type OrderFormDto, type PlaceOrderEventDto, type PlaceOrderErrorDto, toUnvalidatedOrder } from '../../models/dto';
+
+/**
+ * PlaceOrder API
+ */
+export const placeOrderApi = (
+  request: HttpRequest,
+): Effect.Effect<HttpResponse, never, never> =>
+  Effect.gen(function* () {
+    // 1. JSON → DTO
+    const orderFormDto: OrderFormDto = JSON.parse(request.body);
+
+    // 2. DTO → Domain
+    const unvalidatedOrder = toUnvalidatedOrder(orderFormDto);
+
+    // 3. Workflow実行
+    const result = yield* pipe(
+      placeOrder(unvalidatedOrder),
+      Effect.provide(PlaceOrderLive),
+      Effect.either,
+    );
+
+    // 4. Domain → DTO → JSON
+    return workflowResultToHttpResponse(result);
+  });
+
+type JsonString = string;
+
+type HttpRequest = {
+  action: string;
+  uri: string;
+  body: JsonString;
+};
+
+type HttpResponse = {
+  httpStatusCode: number;
+  body: JsonString;
+};
+
+type WorkflowResult = Either.Either<PlaceOrderEvent[], PlaceOrderError>;
+
+/**
+ * ワークフロー結果 → HTTPレスポンス
+ */
+const workflowResultToHttpResponse = (result: WorkflowResult): HttpResponse =>
+  Either.match(result, {
+    onRight: events => {
+      // Domain → DTO → JSON
+      const dtos: PlaceOrderEventDto[] = events.map(fromPlaceOrderEvent);
+      const json = JSON.stringify(dtos);
+      return {
+        httpStatusCode: 200,
+        body: json,
+      };
+    },
+    onLeft: err => {
+      // Domain Error → DTO → JSON
+      const dto: PlaceOrderErrorDto = fromPlaceOrderError(err);
+      const json = JSON.stringify(dto);
+      return {
+        httpStatusCode: 400,
+        body: json,
+      };
+    },
+  });
 
 /**
  * PlaceOrder Workflow
@@ -30,8 +95,9 @@ import { GetProductPrice } from './GetProductPrice';
  *  3. ワークフロー実行: ビジネスロジック（Validate → Price → Acknowledge）
  *  4. 出力: イベントを生成してキューに送信
  */
-export const placeOrderWorkflow = (command: PlaceOrderCommand) =>
-  // ): Effect.Effect<PlaceOrderResult, ParseError, OrderEventQueue> =>
+export const placeOrderWorkflow = (
+  command: PlaceOrderCommand
+): Effect.Effect<PlaceOrderEvent[], PlaceOrderError, OrderEventQueue> =>
   Effect.gen(function* () {
     // コマンドからUnvalidatedOrderを取り出す
     const unvalidatedOrder = command.data;
@@ -67,7 +133,14 @@ const placeOrder = (unvalidatedOrder: UnvalidatedOrder) => {
   return Effect.gen(function* () {
     const validatedOrder = yield* pipe(
       validateOrder(unvalidatedOrder),
-      Effect.mapError(error => PlaceOrderError.Validation({ error })),
+      Effect.mapError(error =>
+        Match.value(error).pipe(
+          Match.discriminatorsExhaustive('_tag')({
+            RemoteServiceError: (error) => PlaceOrderError.RemoteService({ error }),
+            ParseError: (error) => PlaceOrderError.Validation({ error }),
+          }),
+        )
+      ),
     );
     const pricedOrder = yield* pipe(
       priceOrder(validatedOrder),

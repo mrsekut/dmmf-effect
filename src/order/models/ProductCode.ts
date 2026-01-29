@@ -1,5 +1,5 @@
 import { Effect, pipe, Schema } from 'effect';
-import { CheckProductCodeExists } from './workflows/placeOrder/CheckProductCodeExists';
+import { CheckProductCodeExists } from '../workflows/placeOrder/CheckProductCodeExists';
 import { parseError, Type } from 'effect/ParseResult';
 
 /**

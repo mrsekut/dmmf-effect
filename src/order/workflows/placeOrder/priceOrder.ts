@@ -1,7 +1,7 @@
 import { Array, Effect, pipe } from 'effect';
-import { ValidatedOrder, PricedOrder, BillingAmount } from '../../Order';
+import { ValidatedOrder, PricedOrder, BillingAmount } from '../../models/Order';
 import type { GetProductPrice, PricingError } from './GetProductPrice';
-import { toPricedOrderLine } from '../../OrderLine';
+import { toPricedOrderLine } from '../../models/OrderLine';
 
 type PriceOrder = (
   o: ValidatedOrder,

@@ -1,5 +1,5 @@
 import { Effect } from 'effect';
-import type { ProductCode } from '../../ProductCode';
+import type { ProductCode } from '../../models/ProductCode';
 
 /**
  * deps1: CheckProductCodeExists
@@ -16,4 +16,4 @@ export class CheckProductCodeExists extends Effect.Service<CheckProductCodeExist
     }),
     accessors: true,
   },
-) {}
+) { }

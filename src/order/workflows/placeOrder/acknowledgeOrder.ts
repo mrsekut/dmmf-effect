@@ -1,6 +1,6 @@
 import { Option, Effect, Schema, Match, Data, pipe } from 'effect';
-import { PricedOrder } from '../../Order';
-import type { EmailAddress } from '../../CustomerEmail';
+import { PricedOrder } from '../../models/Order';
+import type { EmailAddress } from '../../models/CustomerEmail';
 import type { OrderAcknowledgmentSentEvent } from './publicTypes';
 
 type AcknowledgeOrder = (
@@ -52,7 +52,7 @@ export class CreateOrderAcknowledgementLetter extends Effect.Service<CreateOrder
     }),
     accessors: true,
   },
-) {}
+) { }
 
 type HtmlString = typeof HtmlString.Type;
 const HtmlString = Schema.String.pipe(Schema.brand('HtmlString'));
@@ -73,7 +73,7 @@ export class SendOrderAcknowledgement extends Effect.Service<SendOrderAcknowledg
     }),
     accessors: true,
   },
-) {}
+) { }
 
 type OrderAcknowledgment = {
   emailAddress: EmailAddress;

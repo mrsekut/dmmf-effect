@@ -1,5 +1,5 @@
 import type { OrderPlacedEvent } from './publicTypes';
-import type { PricedOrder } from '../../Order';
+import type { PricedOrder } from '../../models/Order';
 
 /**
  * CreateOrderPlacedEvent

@@ -1,6 +1,6 @@
 import { Effect, Schema } from 'effect';
-import type { ProductCode } from '../../ProductCode';
-import { Price } from '../../OrderLine';
+import type { ProductCode } from '../../models/ProductCode';
+import { Price } from '../../models/OrderLine';
 
 /**
  *  ローカルで実行されるが、失敗の可能性はある
@@ -16,11 +16,11 @@ export class GetProductPrice extends Effect.Service<GetProductPrice>()(
     }),
     accessors: true,
   },
-) {}
+) { }
 
 export class PricingError extends Schema.TaggedError<PricingError>()(
   'PricingError',
   {
     message: Schema.String,
   },
-) {}
+) { }
