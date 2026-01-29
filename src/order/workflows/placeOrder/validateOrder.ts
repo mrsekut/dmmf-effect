@@ -1,8 +1,8 @@
 import { Array, Effect, Schema, ParseResult, pipe } from 'effect';
-import { OrderId, ValidatedOrder, type UnvalidatedOrder } from '../../Order';
-import { toAddress, UnvalidatedAddress } from '../../Address';
-import { toCustomerInfo } from '../../Customer';
-import { OrderLine, toValidatedOrderLine } from '../../OrderLine';
+import { OrderId, ValidatedOrder, type UnvalidatedOrder } from '../../models/Order';
+import { toAddress, UnvalidatedAddress } from '../../models/Address';
+import { toCustomerInfo } from '../../models/Customer';
+import { OrderLine, toValidatedOrderLine } from '../../models/OrderLine';
 import type { CheckProductCodeExists } from './CheckProductCodeExists';
 import { RemoteServiceError } from './publicTypes';
 
@@ -74,7 +74,7 @@ export class CheckAddressExists extends Effect.Service<CheckAddressExists>()(
     }),
     accessors: true,
   },
-) {}
+) { }
 
 type CheckedAddress = typeof CheckedAddress.Type;
 const CheckedAddress = UnvalidatedAddress.pipe(Schema.brand('CheckedAddress'));

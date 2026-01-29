@@ -1,5 +1,5 @@
 import type { Command } from '../../../Command';
-import type { UnvalidatedOrder } from '../../Order';
+import type { UnvalidatedOrder } from '../../models/Order';
 
 /**
  * PlaceOrderCommand（注文確定コマンド）

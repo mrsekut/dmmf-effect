@@ -1,7 +1,7 @@
 import { Array, Effect, Either, Layer, Match, Option, pipe, Queue } from 'effect';
 import { OrderEventQueue } from '../../../queues';
 import { CheckAddressExists, validateOrder } from './validateOrder';
-import type { PricedOrder, UnvalidatedOrder } from '../../Order';
+import type { PricedOrder, UnvalidatedOrder } from '../../models/Order';
 import type { PlaceOrderCommand } from './command';
 import {
   PlaceOrderError,
@@ -18,7 +18,7 @@ import { priceOrder } from './priceOrder';
 import { createOrderPlacedEvent } from './createOrderPlacedEvent';
 import { CheckProductCodeExists } from './CheckProductCodeExists';
 import { GetProductPrice } from './GetProductPrice';
-import { fromPlaceOrderError, fromPlaceOrderEvent, type OrderFormDto, type PlaceOrderEventDto, type PlaceOrderErrorDto, toUnvalidatedOrder } from './dto';
+import { fromPlaceOrderError, fromPlaceOrderEvent, type OrderFormDto, type PlaceOrderEventDto, type PlaceOrderErrorDto, toUnvalidatedOrder } from '../../models/dto';
 
 /**
  * PlaceOrder API

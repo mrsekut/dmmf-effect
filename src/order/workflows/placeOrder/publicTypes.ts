@@ -4,9 +4,9 @@
  */
 import { Data, Schema } from 'effect';
 import type { ParseError } from 'effect/ParseResult';
-import type { PricedOrder, OrderId, BillingAmount } from '../../Order';
-import type { Address } from '../../Address';
-import type { EmailAddress } from '../../CustomerEmail';
+import type { PricedOrder, OrderId, BillingAmount } from '../../models/Order';
+import type { Address } from '../../models/Address';
+import type { EmailAddress } from '../../models/CustomerEmail';
 import type { PricingError } from './GetProductPrice';
 
 // ------------------------------------
@@ -76,7 +76,7 @@ export class RemoteServiceError extends Schema.TaggedError<RemoteServiceError>()
     }),
     message: Schema.String,
   },
-) {}
+) { }
 
 /**
  * PlaceOrderError（注文確定エラー）

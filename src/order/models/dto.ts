@@ -6,14 +6,14 @@
  */
 
 import { Match } from 'effect';
-import type { UnvalidatedOrder } from '../../Order';
+import type { UnvalidatedOrder } from './Order';
 import type {
   PlaceOrderEvent,
   PlaceOrderError,
   OrderPlacedEvent,
   BillableOrderPlacedEvent,
   OrderAcknowledgmentSentEvent,
-} from './publicTypes';
+} from '../workflows/placeOrder/publicTypes';
 
 // ============================================
 // Input DTOs
