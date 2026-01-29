@@ -8,10 +8,4 @@
     "**/coverage/**": true
   },
   "typescript.preferences.importModuleSpecifier": "shortest",
-  "[typescript]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
-  },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
 }
